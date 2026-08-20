@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/autosoft
+    username: autosoft
+    password: autosoft
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+autosoft:
+  jwt:
+    secret: "dev-only-change-me-32bytes-min-secret!"
+
+logging:
+  level:
+    com.autosoft: DEBUG
+    org.springframework: INFO

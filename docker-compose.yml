@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: autosoft-postgres
+    environment:
+      POSTGRES_DB: autosoft
+      POSTGRES_USER: autosoft
+      POSTGRES_PASSWORD: autosoft
+    ports:
+      - "5432:5432"
+    volumes:
+      - autosoft-pg-data:/var/lib/postgresql/data
+volumes:
+  autosoft-pg-data:

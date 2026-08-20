@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: auto-soft
+  profiles:
+    active: dev
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+server:
+  servlet:
+    context-path: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+autosoft:
+  api-prefix: /api
+  auth:
+    register-enabled: false
+  jwt:
+    secret: "dev-only-change-me-32bytes-min-secret!"
+    expire-seconds: 28800
+    issuer: auto-soft
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
