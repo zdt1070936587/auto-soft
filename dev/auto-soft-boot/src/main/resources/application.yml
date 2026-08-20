@@ -5,10 +5,6 @@ spring:
     active: dev
   jackson:
     default-property-inclusion: non_null
-    serialization:
-      write-dates-as-timestamps: false
-    deserialization:
-      fail-on-unknown-properties: false
   mvc:
     async:
       request-timeout: 300000

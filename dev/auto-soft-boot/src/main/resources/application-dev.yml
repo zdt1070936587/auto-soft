@@ -4,8 +4,8 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://127.0.0.1:5432/autosoft
-    username: autosoft
-    password: autosoft
+    username: dafu
+    password: 123456
   flyway:
     enabled: true
     locations: classpath:db/migration
