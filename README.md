@@ -14,7 +14,7 @@ AI 管理后台：用户通过自然语言与系统对话，即可生成自己�
 
 ## 快速开始
 
-需已安装 JDK 21、Maven 3.9+、Node.js 20+、Docker。
+需已安装 JDK 25、Maven 3.9+、Node.js 20+、Docker。
 
 ```bash
 # 1. 启动 PostgreSQL（开发库，密码仅用于本地）

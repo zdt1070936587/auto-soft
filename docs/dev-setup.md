@@ -6,7 +6,7 @@
 
 | 软件 | 版本 |
 | --- | --- |
-| JDK | 21 |
+| JDK | 25 |
 | Maven | 3.9+ |
 | Node.js | 20 LTS+（建议 22） |
 | Docker Desktop | 能跑 `postgres:16` 即可 |
@@ -99,7 +99,7 @@ OpenCode / AES 开发占位：`application.yml` 的 `autosoft.opencode.base-url`
 | Flyway 校验失败 | 开发空库可 `docker compose down -v` 后重建；**不要改已执行的 SQL 文件** |
 | 前端提示无法连接后端 | 确认 8080 已启动；确认 `vite.config.ts` 里 proxy 指向 8080 |
 | 浏览器跨域 | 开发走 Vite 代理即可；若直连 8080，framework 已允许 `http://localhost:5173` |
-| `mvn` 编译失败、JDK 不对 | `java -version` 必须是 21+。本仓库 enforcer 要求 `[21,)`。若系统 `JAVA_HOME` 仍指向 JDK 8，编译前先切换，例如：`$env:JAVA_HOME="C:\Program Files\Java\JDK25\jdk-25+36"` |
+| `mvn` 编译失败、JDK 不对 | `java -version` 必须是 25+。本仓库 enforcer 要求 `[25,)`。若系统 `JAVA_HOME` 仍指向旧 JDK，编译前先切换，例如：`$env:JAVA_HOME="C:\Program Files\Java\JDK25\jdk-25+36"` |
 | 前端 Vite 起不来、Node 过旧 | 需要 Node 20+。本仓库 `web/package.json` 已用 Volta 锁定 `20.18.0`，安装 Volta 后在 `web/` 下执行命令即可自动切换 |
 | 健康接口 `db=DOWN` 但进程还在 | 启动后 Postgres 被停掉时的预期行为；接口仍返回 `code=0`，用 `data.db` 表达库状态 |
 | 登录 401「用户名或密码错误」 | 确认 Flyway `V1.1.0` 已执行、种子用户存在；密码为 `admin123` |
@@ -110,7 +110,7 @@ OpenCode / AES 开发占位：`application.yml` 的 `autosoft.opencode.base-url`
 ## 6. 模块启动顺序
 
 1. PostgreSQL（`docker compose up -d`）
-2. 后端 `cd dev && mvn -pl auto-soft-boot -am spring-boot:run`（JDK 21+）
+2. 后端 `cd dev && mvn -pl auto-soft-boot -am spring-boot:run`（JDK 25+）
 3. 前端 `cd web && npm run dev`
 
 接口说明：[api.md](./api.md)；操作手册：[user-guide.md](./user-guide.md)。

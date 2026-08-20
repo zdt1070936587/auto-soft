@@ -44,7 +44,7 @@ flowchart LR
 
 | 层 | 选型 |
 | --- | --- |
-| JDK | 21 LTS |
+| JDK | 25 |
 | 后端 | Spring Boot 4.1.x、Spring Security、JWT（阶段 1 起） |
 | ORM | MyBatis-Plus（阶段 1 起接入） |
 | 工作流 | warm-flow（阶段 4） |

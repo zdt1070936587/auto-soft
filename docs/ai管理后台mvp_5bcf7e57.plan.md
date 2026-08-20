@@ -67,7 +67,7 @@ flowchart LR
 
 | 层 | 选型 |
 | --- | --- |
-| JDK | 21 LTS（Spring Boot 4 最低 17，21 更稳） |
+| JDK | 25（编译 release 与运行均要求 25+） |
 | 后端 | Spring Boot **4.1.x** + Spring Security + JWT |
 | ORM | MyBatis-Plus（与 warm-flow sb4 starter 对齐） |
 | 工作流 | `warm-flow-mybatis-plus-sb4-starter`（当前 1.8.9） |

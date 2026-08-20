@@ -29,7 +29,7 @@ public class ChatCompletionsClient {
     private final JsonMapper jsonMapper;
 
     public ChatCompletionsClient(@Qualifier("openCodeRestClient") RestClient restClient, JsonMapper jsonMapper) {
-        this.restClient = openCodeRestClient;
+        this.restClient = restClient;
         this.jsonMapper = jsonMapper;
     }
 
