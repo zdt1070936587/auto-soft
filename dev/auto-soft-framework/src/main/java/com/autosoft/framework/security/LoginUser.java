@@ -23,7 +23,18 @@ public class LoginUser implements Serializable {
     private Set<String> permissions = new LinkedHashSet<>();
 
     public boolean isSuperAdmin() {
-        return roleCodes.contains(RoleCodes.SUPER_ADMIN);
+        return getRoleCodes().contains(RoleCodes.SUPER_ADMIN);
+    }
+
+    public boolean isDeveloper() {
+        return isSuperAdmin() || getRoleCodes().contains(RoleCodes.DEVELOPER);
+    }
+
+    public boolean hasPermission(String permission) {
+        if (isSuperAdmin()) {
+            return true;
+        }
+        return getPermissions().contains(permission);
     }
 
     public Long getUserId() {

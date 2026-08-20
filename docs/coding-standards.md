@@ -50,8 +50,14 @@ Controller 不直接暴露 DO。对象分层：DO / DTO / Query / VO。
 ## 6. 日志
 
 - 使用 SLF4J，`{}` 占位，禁止字符串拼接拼日志。
-- **禁止**输出密码、token、身份证号等敏感信息。
+- **禁止**输出密码、token、身份证号等敏感信息。登录失败只记录用户名，不记录密码，不打印完整 JWT。
 - 异常日志带上业务关键参数（用户 ID、实体编码），相当于保护案发现场。
+
+## 6.1 权限
+
+- 接口鉴权使用 `@RequiresPermission("system:user:list")`，由 AOP 校验。Controller 内禁止手写权限 `if`。
+- `SUPER_ADMIN` 绕过权限码；其它角色以库中菜单权限为准，**不要把权限码写入 JWT**。
+- 当前用户从 `SecurityUtils` 读取，Controller 不解析 token。
 
 ## 7. API
 
@@ -70,7 +76,13 @@ Controller 不直接暴露 DO。对象分层：DO / DTO / Query / VO。
 
 - 组件 PascalCase；组合与工具 camelCase。
 - HTTP 经 `api/http.ts` 解包 `R<T>`，`code !== 0` 时提示 `msg`。
-- 阶段 0 不携带 token；阶段 1 在拦截器中统一附加。
+- Token 存 `autosoft.token`（记住登录用 localStorage，否则 sessionStorage）；请求拦截器附加 `Authorization: Bearer`。HTTP 401 清 token 并跳转登录（登录接口本身的 401 只提示错误）。
+
+## 9.1 操作日志与工具校验
+
+- 写操作在 Service 方法上标 `@OperLog(module, action)`，由 AOP 落 `sys_oper_log`。详情脱敏：密码、token、API Key 不入库。
+- Agent 工具参数必须再走 `MetaCatalogService` / `Identifiers` / `FieldTypes`，不信任模型 JSON。
+- 每个请求有 `traceId`（MDC + `R.traceId` + `X-Trace-Id`）。
 
 ## 10. Git
 

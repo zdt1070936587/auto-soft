@@ -31,6 +31,7 @@
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
         <nimbus-jose-jwt.version>10.3</nimbus-jose-jwt.version>
+        <warm-flow.version>1.8.9</warm-flow.version>
     </properties>
 
     <dependencyManagement>
@@ -46,6 +47,21 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dromara.warm</groupId>
+                <artifactId>warm-flow-mybatis-plus-sb4-starter</artifactId>
+                <version>${warm-flow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbus-jose-jwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.autosoft</groupId>

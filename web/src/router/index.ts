@@ -6,7 +6,15 @@ import HealthView from '@/views/health/HealthView.vue'
 import WorkbenchView from '@/views/dashboard/WorkbenchView.vue'
 import UserView from '@/views/system/user/UserView.vue'
 import RoleView from '@/views/system/role/RoleView.vue'
+import MetaAppView from '@/views/meta/MetaAppView.vue'
+import RuntimePageView from '@/views/runtime/RuntimePageView.vue'
+import StudioView from '@/views/studio/StudioView.vue'
+import LlmSettingView from '@/views/system/LlmSettingView.vue'
+import TodoView from '@/views/flow/TodoView.vue'
+import DoneView from '@/views/flow/DoneView.vue'
+import OperLogView from '@/views/system/OperLogView.vue'
 import ForbiddenView from '@/views/error/ForbiddenView.vue'
+import NotFoundView from '@/views/error/NotFoundView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -55,11 +63,47 @@ const router = createRouter({
           name: 'roles',
           component: RoleView,
         },
+        {
+          path: 'meta/apps',
+          name: 'meta-apps',
+          component: MetaAppView,
+        },
+        {
+          path: 'app/:app/:entity',
+          name: 'runtime',
+          component: RuntimePageView,
+        },
+        {
+          path: 'studio',
+          name: 'studio',
+          component: StudioView,
+        },
+        {
+          path: 'system/llm',
+          name: 'llm',
+          component: LlmSettingView,
+        },
+        {
+          path: 'flow/todo',
+          name: 'flow-todo',
+          component: TodoView,
+        },
+        {
+          path: 'flow/done',
+          name: 'flow-done',
+          component: DoneView,
+        },
+        {
+          path: 'system/logs',
+          name: 'logs',
+          component: OperLogView,
+        },
       ],
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/dashboard',
+      name: 'not-found',
+      component: NotFoundView,
     },
   ],
 })

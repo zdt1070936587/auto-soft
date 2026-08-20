@@ -15,5 +15,6 @@
 | [coding-standards.md](./coding-standards.md) | 编码规范（Code Review 清单） |
 | [database.md](./database.md) | 数据库约定与表规划 |
 | [dev-setup.md](./dev-setup.md) | 本地启动与排障 |
-
-后续将补充 `api.md`、`user-guide.md`（阶段 5 产出）。
+| [api.md](./api.md) | 稳定接口一览 |
+| [user-guide.md](./user-guide.md) | 使用手册 |
+| [e2e-mvp.md](./e2e-mvp.md) | 端到端走查记录 |

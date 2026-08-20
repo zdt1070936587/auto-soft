@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function canAccess(path: string) {
-    if (path === '/dashboard' || path === '/dev/health' || path === '/403') {
+    if (path === '/dashboard' || path === '/dev/health' || path === '/403' || path === '/404') {
       return true
     }
     return accessiblePaths.value.includes(path)

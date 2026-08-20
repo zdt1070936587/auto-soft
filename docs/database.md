@@ -70,14 +70,127 @@ docker compose up -d
 
 启动成功后应存在 1 行：`phase-0` / `flyway baseline`。同时存在 Flyway 表 `flyway_schema_history`。
 
-## 后续表规划（尚未建表）
+## 阶段 1 已建表（`V1.1.0__sys_user_role.sql`）
 
-详见 [分阶段开发计划.md](./分阶段开发计划.md) 第 10 节。名称预告：
+公共字段：`created_by` / `created_at` / `updated_by` / `updated_at` / `deleted`（0 否 1 是）。中间表不做逻辑删除。
 
-- 用户权限：`sys_user`、`sys_role`、`sys_user_role`、`sys_menu`、`sys_role_menu`
-- LLM：`sys_llm_config`、`ai_session`、`ai_message`、`ai_tool_log`
-- 元数据：`meta_app`、`meta_entity`、`meta_field`、`meta_page`、`meta_app_menu`
-- 工作流：warm-flow 官方 PostgreSQL 脚本 + `meta_entity_flow`
+### sys_user
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | `BIGSERIAL` | 主键 |
+| `username` | `VARCHAR(64)` | 登录名；部分唯一索引 `WHERE deleted = 0` |
+| `password` | `VARCHAR(128)` | BCrypt 密文 |
+| `nickname` | `VARCHAR(64)` | 显示名 |
+| `status` | `SMALLINT` | 1 启用 0 停用 |
+| `last_login_at` | `TIMESTAMPTZ` | 最近登录，可空 |
+| 公共字段 | | |
+
+### sys_role
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | `BIGSERIAL` | 主键 |
+| `code` | `VARCHAR(64)` | 角色编码，未删除范围内唯一。内置：`SUPER_ADMIN` / `ADMIN` / `DEVELOPER` / `USER` |
+| `name` | `VARCHAR(64)` | 名称 |
+| `remark` | `VARCHAR(256)` | 可空 |
+| `sort` | `INT` | 排序 |
+| `status` | `SMALLINT` | 1 启用 0 停用 |
+| `builtin` | `SMALLINT` | 1 内置不可删 |
+| 公共字段 | | |
+
+### sys_user_role
+
+`id`、`user_id`、`role_id`，`UNIQUE(user_id, role_id)`。解绑物理删除。
+
+### sys_menu
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | `BIGSERIAL` | 主键 |
+| `parent_id` | `BIGINT` | 0 表示根 |
+| `name` | `VARCHAR(64)` | 标题 |
+| `path` | `VARCHAR(128)` | 前端路由，按钮可空 |
+| `component` | `VARCHAR(128)` | 前端组件名，目录可空 |
+| `menu_type` | `VARCHAR(16)` | `DIR` / `MENU` / `BUTTON` |
+| `permission` | `VARCHAR(128)` | 权限码，按钮必填 |
+| `icon` | `VARCHAR(64)` | 可空 |
+| `sort` | `INT` | |
+| `visible` | `SMALLINT` | 1 显示 0 隐藏（隐藏仍可授权接口） |
+| `status` | `SMALLINT` | 1 启用 |
+| 公共字段 | | |
+
+阶段 1 菜单：`/dashboard`、`/system`（DIR）、`/system/users`、`/system/roles`，以及对应用户/角色按钮权限。
+
+### sys_role_menu
+
+`id`、`role_id`、`menu_id`，`UNIQUE(role_id, menu_id)`。解绑物理删除。
+
+种子用户（密码均为 `admin123`，仅开发库）：`admin`（SUPER_ADMIN）、`demo_admin`、`demo_dev`、`demo_user`。
+
+## 阶段 2 已建表（`V1.2.0__meta_engine.sql`）
+
+动态业务表名：`dyn_{appCode}_{entityCode}`，仅允许此前缀 DDL，无 DROP。
+
+### meta_app
+
+`code`、`name`、`status`（DRAFT/PUBLISHED）、`version`、`grant_roles`、`remark` + 公共字段。未删除范围内 `code` 唯一。
+
+### meta_entity
+
+`app_id`、`code`、`name`、`remark` + 公共字段。同一 app 下 `code` 唯一。
+
+### meta_field
+
+`entity_id`、`code`、`name`、`field_type`、`length`、`nullable_flag`、`default_value`、`options_json`、`ref_app`、`ref_entity`、`sort`、`queryable`、`listed`、`required_flag` + 公共字段。
+
+### meta_page
+
+`entity_id`、`page_type`（LIST/FORM/DETAIL）、`schema_json` + 公共字段。
+
+### meta_app_menu
+
+`app_id`、`menu_id`，记录发布生成的菜单以便取消发布时隐藏。
+
+演示草稿：`demo` / 实体 `item`（name/qty/remark），需调用发布接口后 USER 才可见。
+
+## 阶段 3 已建表（`V1.3.0__ai_studio.sql`）
+
+### sys_llm_config
+
+`api_key_cipher`、`api_key_iv`、`default_model`、`allowed_models_json` + 公共字段。Key 不以明文存储。
+
+### ai_session
+
+`user_id`、`title`、`app_id`、`status`、`token_input`、`token_output` + 公共字段。
+
+### ai_message
+
+`session_id`、`role`、`content`、`tool_name`、`tool_call_id`、`tokens` + 公共字段。
+
+### ai_tool_log
+
+`session_id`、`tool_name`、`arguments_json`、`result_json`（截断）、`success`、`error_msg`、`duration_ms` + 公共字段。
+
+## 阶段 4 已建表（`V1.4.0__warm_flow.sql`）
+
+官方 warm-flow 脚本未能从仓库拉取；业务使用自建表，接口契约不变。starter 坐标锁定 1.8.9，`warm-flow.enabled=false`。
+
+### meta_entity_flow
+
+`entity_id`（未删除唯一）、`flow_code`、`definition_id`、`approve_role_codes`、`enabled` + 公共字段。
+
+### sys_flow_definition / sys_flow_instance / sys_flow_task
+
+单线审批运行表：定义、实例、待办任务（`comment_text`、办理角色、状态 pending/done/rejected）。
+
+动态表示例列 `flow_status`：`none/draft/processing/approved/rejected`。
+
+## 阶段 5 已建表（`V1.5.0__sys_oper_log.sql`）
+
+### sys_oper_log
+
+无逻辑删除。`user_id`、`username`、`module`、`action`、`biz_id`、`success`、`ip`、`cost_ms`、`detail_json`（脱敏）、`created_at`。
 
 本地空库可重建（会丢数据）：
 

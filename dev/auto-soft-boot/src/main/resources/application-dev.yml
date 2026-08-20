@@ -13,6 +13,11 @@ spring:
 autosoft:
   jwt:
     secret: "dev-only-change-me-32bytes-min-secret!"
+  crypto:
+    aes-key: "dev-only-aes-key-change-me-please!"
+  opencode:
+    base-url: "https://opencode.ai/zen/go/v1"
+    timeout-seconds: 120
 
 logging:
   level:

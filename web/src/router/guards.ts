@@ -33,6 +33,10 @@ export function setupRouterGuards(router: Router) {
       return '/dashboard'
     }
 
+    if (to.name === 'not-found' || to.path === '/403') {
+      return true
+    }
+
     if (!auth.canAccess(to.path)) {
       return '/403'
     }

@@ -6,6 +6,7 @@ import com.autosoft.common.core.RoleCodes;
 import com.autosoft.common.core.UserStatus;
 import com.autosoft.common.exception.BizException;
 import com.autosoft.common.utils.AssertUtils;
+import com.autosoft.framework.log.OperLog;
 import com.autosoft.framework.security.LoginUser;
 import com.autosoft.framework.security.SecurityUtils;
 import com.autosoft.system.auth.PasswordManager;
@@ -64,6 +65,7 @@ public class UserService {
         return toVo(requireUser(id));
     }
 
+    @OperLog(module = "USER", action = "CREATE")
     @Transactional(rollbackFor = Exception.class)
     public Long create(UserCreateDTO dto) {
         assertUsernameUnique(dto.getUsername(), null);
@@ -79,6 +81,7 @@ public class UserService {
         return user.getId();
     }
 
+    @OperLog(module = "USER", action = "UPDATE")
     @Transactional(rollbackFor = Exception.class)
     public void update(Long id, UserUpdateDTO dto) {
         UserDO user = requireUser(id);
@@ -106,6 +109,7 @@ public class UserService {
         userMapper.updateById(user);
     }
 
+    @OperLog(module = "USER", action = "UPDATE")
     @Transactional(rollbackFor = Exception.class)
     public void assignRoles(Long id, List<Long> roleIds) {
         requireUser(id);
@@ -114,6 +118,7 @@ public class UserService {
         replaceRoles(id, roleIds);
     }
 
+    @OperLog(module = "USER", action = "DELETE")
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         Long currentId = SecurityUtils.requireUser().getUserId();

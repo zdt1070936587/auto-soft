@@ -9,6 +9,9 @@ spring:
       write-dates-as-timestamps: false
     deserialization:
       fail-on-unknown-properties: false
+  mvc:
+    async:
+      request-timeout: 300000
 
 server:
   servlet:
@@ -31,6 +34,18 @@ autosoft:
     secret: "dev-only-change-me-32bytes-min-secret!"
     expire-seconds: 28800
     issuer: auto-soft
+  crypto:
+    aes-key: "dev-only-aes-key-change-me-please!"
+  opencode:
+    base-url: "https://opencode.ai/zen/go/v1"
+    timeout-seconds: 120
+
+warm-flow:
+  enabled: false
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [traceId=%X{traceId}] - %msg%n"
 
 mybatis-plus:
   configuration:

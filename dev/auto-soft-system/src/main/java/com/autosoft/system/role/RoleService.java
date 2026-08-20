@@ -4,6 +4,7 @@ import com.autosoft.common.core.PageResult;
 import com.autosoft.common.core.ResultCode;
 import com.autosoft.common.exception.BizException;
 import com.autosoft.common.utils.AssertUtils;
+import com.autosoft.framework.log.OperLog;
 import com.autosoft.system.dto.RoleCreateDTO;
 import com.autosoft.system.dto.RoleQuery;
 import com.autosoft.system.dto.RoleUpdateDTO;
@@ -62,6 +63,7 @@ public class RoleService {
         return roles.stream().map(menuService::toRoleVo).toList();
     }
 
+    @OperLog(module = "ROLE", action = "CREATE")
     @Transactional(rollbackFor = Exception.class)
     public Long create(RoleCreateDTO dto) {
         RoleDO existing = roleMapper.selectOne(new LambdaQueryWrapper<RoleDO>().eq(RoleDO::getCode, dto.getCode()));
@@ -109,6 +111,7 @@ public class RoleService {
         return menuService.listMenuIdsByRole(roleId);
     }
 
+    @OperLog(module = "ROLE", action = "UPDATE")
     @Transactional(rollbackFor = Exception.class)
     public void grantMenus(Long roleId, List<Long> menuIds) {
         requireRole(roleId);

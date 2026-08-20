@@ -26,7 +26,7 @@ onMounted(() => {
 
 <template>
   <div class="page">
-    <Card title="阶段 0 健康检查" :loading="loading">
+    <Card title="开发健康检查" :loading="loading">
       <template v-if="health">
         <Descriptions :column="1" bordered>
           <Descriptions.Item label="应用">{{ health.appName }}</Descriptions.Item>

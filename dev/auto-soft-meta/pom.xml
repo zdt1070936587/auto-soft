@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.autosoft</groupId>
-            <artifactId>auto-soft-framework</artifactId>
+            <artifactId>auto-soft-system</artifactId>
         </dependency>
     </dependencies>
 </project>
