@@ -33,12 +33,18 @@ http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config
 })
 
+function rejectWithMessage(text: string, showToast = true) {
+  if (showToast) {
+    message.error({ content: text, key: 'http-error', duration: 3 })
+  }
+  return Promise.reject(new Error(text))
+}
+
 http.interceptors.response.use(
   (response: AxiosResponse<ApiResult<unknown>>) => {
     const payload = response.data
     if (payload && typeof payload.code === 'number' && payload.code !== 0) {
-      message.error(payload.msg || '请求失败')
-      return Promise.reject(new Error(payload.msg || '请求失败'))
+      return rejectWithMessage(payload.msg || '请求失败')
     }
     return response
   },
@@ -48,24 +54,19 @@ http.interceptors.response.use(
     const msg = payload?.msg
     if (status === 401) {
       if (isLoginRequest(error.config)) {
-        message.error(msg || '用户名或密码错误')
-        return Promise.reject(error)
+        return rejectWithMessage(msg || '用户名或密码错误')
       }
       clearToken()
       onUnauthorized?.()
-      message.error(msg || '登录已失效')
-      return Promise.reject(error)
+      return rejectWithMessage(msg || '登录已失效')
     }
     if (status === 403) {
-      message.error(msg || '无权限')
-      return Promise.reject(error)
+      return rejectWithMessage(msg || '无权限')
     }
     if (error.response) {
-      message.error(msg || '请求失败')
-      return Promise.reject(error)
+      return rejectWithMessage(msg || '请求失败')
     }
-    message.error('无法连接后端，请确认 8080 已启动')
-    return Promise.reject(error)
+    return rejectWithMessage('无法连接后端，请确认 8080 已启动')
   },
 )
 

@@ -24,6 +24,19 @@ export interface StudioSseEvent {
   data: Record<string, unknown>
 }
 
+/** ask_user 事件：{ question: string } */
+export function isAskUserEvent(event: StudioSseEvent): boolean {
+  return event.event === 'ask_user'
+}
+
+export function extractAskUserQuestion(data: Record<string, unknown>): string {
+  const question = data.question
+  if (typeof question === 'string' && question.trim()) {
+    return question
+  }
+  return '请确认以上方案，或提出修改意见。'
+}
+
 export function listSessions() {
   return http.get<ApiResult<AiSessionVO[]>>('/studio/sessions').then((res) => res.data.data)
 }

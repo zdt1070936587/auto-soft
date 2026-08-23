@@ -118,18 +118,28 @@ public class AgentService {
             persistToolCalls(session.getId(), turn);
             messages.add(assistantToolCallMessage(turn));
             ToolContext context = new ToolContext(session, sessionMapper);
+            boolean askedUser = false;
             for (LlmTurn.ToolCall call : turn.getToolCalls()) {
-                executeOneTool(session, context, call, messages, emitter);
+                if (executeOneTool(session, context, call, messages, emitter)) {
+                    askedUser = true;
+                }
             }
             if (context.isSchemaUpdated()) {
                 emit(emitter, "schema_updated", Map.of("appId", nvl(session.getAppId())));
+            }
+            if (askedUser) {
+                // 等待用户确认后再开新 turn，避免确认已出仍继续调模型
+                return true;
             }
         }
         return false;
     }
 
-    private void executeOneTool(AiSessionDO session, ToolContext context, LlmTurn.ToolCall call,
-                                List<Map<String, Object>> messages, SseEmitter emitter) {
+    /**
+     * @return true 表示本工具为 ask_user，调用方应结束本轮
+     */
+    private boolean executeOneTool(AiSessionDO session, ToolContext context, LlmTurn.ToolCall call,
+                                   List<Map<String, Object>> messages, SseEmitter emitter) {
         emit(emitter, "tool_start", Map.of("tool", nz(call.getName()), "arguments", nz(call.getArgumentsJson())));
         long start = System.currentTimeMillis();
         boolean ok = true;
@@ -151,9 +161,30 @@ public class AgentService {
         persistMessage(session.getId(), "tool", result, call.getName(), call.getId());
         messages.add(toolMessage(call, result));
         emit(emitter, "tool_end", Map.of("tool", nz(call.getName()), "success", ok, "result", ToolRegistry.truncate(result)));
-        if ("ask_user".equals(call.getName()) && call.getArgumentsJson() != null) {
-            emit(emitter, "text", Map.of("content", "需要确认：" + call.getArgumentsJson()));
+        if (!"ask_user".equals(call.getName())) {
+            return false;
         }
+        String question = extractAskUserQuestion(call.getArgumentsJson());
+        persistMessage(session.getId(), "assistant", question, "ask_user", null);
+        emit(emitter, "ask_user", Map.of("question", question));
+        return true;
+    }
+
+    private String extractAskUserQuestion(String argumentsJson) {
+        if (argumentsJson == null || argumentsJson.isBlank()) {
+            return "请确认以上方案，或提出修改意见。";
+        }
+        try {
+            Map<String, Object> args = jsonMapper.readValue(argumentsJson, new TypeReference<Map<String, Object>>() {
+            });
+            Object question = args.get("question");
+            if (question != null && !String.valueOf(question).isBlank()) {
+                return String.valueOf(question);
+            }
+        } catch (Exception ignored) {
+            // 解析失败时把整段参数当作确认文案
+        }
+        return argumentsJson;
     }
 
     private AiSessionDO loadSession(Long sessionId) {

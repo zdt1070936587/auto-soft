@@ -56,17 +56,44 @@ export const useAuthStore = defineStore('auth', () => {
     ready.value = true
   }
 
-  async function login(username: string, password: string, remember: boolean) {
+  function collectPermissions(menuList: MenuVO[]): string[] {
+    const codes: string[] = []
+    for (const menu of menuList) {
+      if (menu.permission) {
+        codes.push(menu.permission)
+      }
+      if (menu.children?.length) {
+        codes.push(...collectPermissions(menu.children))
+      }
+    }
+    return codes
+  }
+
+  async function login(username: string, password: string, _remember: boolean) {
     const data = await loginApi(username, password)
-    setToken(data.token, remember)
+    if (!data?.token) {
+      throw new Error('登录响应无效')
+    }
+    setToken(data.token)
     token.value = data.token
     user.value = data.user
-    menus.value = data.menus
-    const me = await getCurrentUser()
-    user.value = me.user
-    menus.value = me.menus
-    permissions.value = me.permissions
+    menus.value = data.menus || []
+    permissions.value = collectPermissions(menus.value)
     ready.value = true
+    try {
+      const me = await getCurrentUser()
+      user.value = me.user
+      menus.value = me.menus
+      permissions.value = me.permissions
+    } catch {
+      // /me 失败时拦截器可能清掉 token，这里恢复登录态，避免卡在登录页
+      setToken(data.token)
+      token.value = data.token
+      user.value = data.user
+      menus.value = data.menus || []
+      permissions.value = collectPermissions(menus.value)
+      ready.value = true
+    }
   }
 
   function logout() {

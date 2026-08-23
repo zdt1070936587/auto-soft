@@ -141,8 +141,8 @@ watch(
 </script>
 
 <template>
-  <div>
-    <Form layout="inline" class="toolbar" @finish="load">
+  <div class="schema-renderer">
+    <Form layout="inline" class="page-toolbar" @finish="load">
       <Form.Item v-for="field in queryFields" :key="field.code" :label="field.name">
         <Input v-model:value="query[field.code]" allow-clear />
       </Form.Item>
@@ -162,6 +162,7 @@ watch(
       </Form.Item>
     </Form>
     <Table
+      class="schema-table"
       row-key="id"
       :loading="loading"
       :data-source="records"
@@ -209,7 +210,11 @@ watch(
 </template>
 
 <style scoped>
-.toolbar {
-  margin-bottom: 16px;
+.schema-renderer :deep(.ant-form-item-label > label) {
+  color: var(--text-2);
+}
+
+.schema-table :deep(.ant-table-cell) {
+  font-size: 13px;
 }
 </style>

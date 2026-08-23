@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, h, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Dropdown, Form, Input, Layout, Menu, Modal, message } from 'ant-design-vue'
+import {
+  AppstoreOutlined,
+  DashboardOutlined,
+  DownOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SettingOutlined,
+  UserOutlined,
+} from '@ant-design/icons-vue'
+import { Breadcrumb, Dropdown, Form, Input, Layout, Menu, Modal, message } from 'ant-design-vue'
+import AppLogo from '@/components/brand/AppLogo.vue'
 import { updatePassword } from '@/api/auth'
 import type { MenuVO } from '@/api/types'
+import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const app = useAppStore()
 const passwordOpen = ref(false)
 const saving = ref(false)
 const passwordForm = reactive({
@@ -16,10 +28,30 @@ const passwordForm = reactive({
   newPassword: '',
 })
 
+const collapsed = computed(() => app.sidebarCollapsed)
+const openMenuKeys = ref<string[]>([])
+
 interface SideItem {
   key: string
   label: string
+  icon?: () => ReturnType<typeof DashboardOutlined>
   children?: SideItem[]
+}
+
+function menuIcon(path?: string) {
+  if (!path) {
+    return SettingOutlined
+  }
+  if (path === '/dashboard') {
+    return DashboardOutlined
+  }
+  if (path.startsWith('/app/')) {
+    return AppstoreOutlined
+  }
+  if (path.startsWith('/system') || path.startsWith('/meta') || path.startsWith('/flow')) {
+    return SettingOutlined
+  }
+  return DashboardOutlined
 }
 
 function toItems(menus: MenuVO[]): SideItem[] {
@@ -27,9 +59,11 @@ function toItems(menus: MenuVO[]): SideItem[] {
     .filter((menu) => menu.menuType !== 'BUTTON')
     .map((menu) => {
       const children = menu.children?.length ? toItems(menu.children) : undefined
+      const Icon = menuIcon(menu.path)
       return {
         key: menu.path || String(menu.id),
         label: menu.name,
+        icon: () => h(Icon),
         children: children && children.length ? children : undefined,
       }
     })
@@ -37,18 +71,40 @@ function toItems(menus: MenuVO[]): SideItem[] {
 
 const menuItems = computed(() => toItems(auth.menus))
 const selectedKeys = computed(() => [route.path])
-const openKeys = computed(() => {
-  if (route.path.startsWith('/system')) {
+
+function resolveOpenKeys(path: string) {
+  if (path.startsWith('/system')) {
     return ['/system']
   }
-  if (route.path.startsWith('/flow')) {
+  if (path.startsWith('/flow')) {
     return ['/flow']
   }
-  if (route.path.startsWith('/app/')) {
-    const parts = route.path.split('/')
+  if (path.startsWith('/app/')) {
+    const parts = path.split('/')
     return parts.length >= 3 ? [`/app/${parts[2]}`] : []
   }
   return []
+}
+
+openMenuKeys.value = resolveOpenKeys(route.path)
+
+const breadcrumbs = computed(() => {
+  const items: Array<{ title: string; path?: string }> = [{ title: '工作台', path: '/dashboard' }]
+  const title = String(route.meta.title || '')
+  if (route.path.startsWith('/app/')) {
+    const parts = route.path.split('/')
+    if (parts[2]) {
+      items.push({ title: parts[2], path: `/app/${parts[2]}` })
+    }
+    if (parts[3]) {
+      items.push({ title: title || parts[3] })
+    }
+    return items
+  }
+  if (route.path !== '/dashboard' && title) {
+    items.push({ title })
+  }
+  return items
 })
 
 function onMenuClick(info: { key: string | number }) {
@@ -56,6 +112,14 @@ function onMenuClick(info: { key: string | number }) {
   if (path.startsWith('/')) {
     void router.push(path)
   }
+}
+
+function onOpenChange(keys: string[]) {
+  openMenuKeys.value = keys
+}
+
+function toggleSidebar() {
+  app.toggleSidebar()
 }
 
 function logout() {
@@ -78,28 +142,78 @@ async function submitPassword() {
 
 <template>
   <Layout class="admin-root">
-    <Layout.Sider width="220" theme="dark">
-      <div class="logo">auto-soft</div>
+    <Layout.Sider
+      :collapsed="app.sidebarCollapsed"
+      class="sider"
+      :width="232"
+      :collapsed-width="72"
+      :trigger="null"
+      collapsible
+      @update:collapsed="app.setSidebarCollapsed"
+    >
+      <div class="logo-bar" :class="{ collapsed }">
+        <RouterLink to="/dashboard" class="logo-link">
+          <AppLogo size="md" theme="dark" :collapsed="collapsed" />
+        </RouterLink>
+        <button class="collapse-btn" type="button" :title="collapsed ? '展开菜单' : '收起菜单'" @click="toggleSidebar">
+          <MenuUnfoldOutlined v-if="collapsed" />
+          <MenuFoldOutlined v-else />
+        </button>
+      </div>
       <Menu
         theme="dark"
         mode="inline"
+        class="side-menu"
+        :inline-collapsed="collapsed"
         :selected-keys="selectedKeys"
-        :open-keys="openKeys"
+        :open-keys="collapsed ? [] : openMenuKeys"
         :items="menuItems"
         @click="onMenuClick"
+        @open-change="onOpenChange"
       />
+      <div v-if="!collapsed" class="sider-foot">
+        <span class="sider-foot__label">AI 管理后台</span>
+        <span class="sider-foot__ver">v0.1</span>
+      </div>
     </Layout.Sider>
-    <Layout>
+    <Layout class="main-layout">
       <Layout.Header class="header">
-        <div class="title">{{ route.meta.title || '工作台' }}</div>
-        <div class="user">
-          <span>{{ auth.user?.nickname }}（{{ auth.roleNames || '未分配角色' }}）</span>
-          <Dropdown>
-            <a class="link">账号</a>
+        <div class="header-left">
+          <button
+            v-if="collapsed"
+            class="header-collapse-btn"
+            type="button"
+            title="展开菜单"
+            @click="toggleSidebar"
+          >
+            <MenuUnfoldOutlined />
+          </button>
+          <Breadcrumb class="breadcrumb">
+            <Breadcrumb.Item v-for="(item, index) in breadcrumbs" :key="`${item.title}-${index}`">
+              <a v-if="item.path && index < breadcrumbs.length - 1" @click.prevent="router.push(item.path)">
+                {{ item.title }}
+              </a>
+              <span v-else>{{ item.title }}</span>
+            </Breadcrumb.Item>
+          </Breadcrumb>
+        </div>
+        <div class="header-right">
+          <div class="user-chip">
+            <span class="user-avatar"><UserOutlined /></span>
+            <div class="user-meta">
+              <span class="user-name">{{ auth.user?.nickname }}</span>
+              <span class="user-role">{{ auth.roleNames || '未分配角色' }}</span>
+            </div>
+          </div>
+          <Dropdown placement="bottomRight">
+            <button class="account-btn" type="button">
+              账号
+              <DownOutlined />
+            </button>
             <template #overlay>
               <Menu>
                 <Menu.Item key="password" @click="passwordOpen = true">修改密码</Menu.Item>
-                <Menu.Item key="logout" @click="logout">退出</Menu.Item>
+                <Menu.Item key="logout" @click="logout">退出登录</Menu.Item>
               </Menu>
             </template>
           </Dropdown>
@@ -125,44 +239,205 @@ async function submitPassword() {
 <style scoped>
 .admin-root {
   min-height: 100vh;
+  background: var(--bg-base);
 }
 
-.logo {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+.sider {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid var(--border);
+  background: linear-gradient(180deg, #121826 0%, #0f1522 100%) !important;
 }
 
-.header {
-  background: #fff;
+.logo-bar {
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  gap: 6px;
+  padding: 0 10px 0 14px;
+  border-bottom: 1px solid var(--border);
 }
 
-.title {
-  font-weight: 600;
+.logo-bar.collapsed {
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px 6px;
+  height: auto;
+  min-height: 52px;
 }
 
-.user {
-  display: flex;
-  gap: 16px;
+.logo-link {
+  display: inline-flex;
   align-items: center;
+  min-width: 0;
+  text-decoration: none;
 }
 
-.link {
-  color: #1677ff;
+.collapse-btn,
+.header-collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+  flex-shrink: 0;
+}
+
+.collapse-btn:hover,
+.header-collapse-btn:hover {
+  border-color: rgba(91, 140, 255, 0.35);
+  color: var(--primary);
+  background: rgba(91, 140, 255, 0.08);
+}
+
+.side-menu {
+  padding: 12px 0 64px;
+  background: transparent !important;
+  border-inline-end: none !important;
+}
+
+.sider-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.sider-foot__ver {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+}
+
+.main-layout {
+  background: var(--bg-base);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 56px;
+  line-height: 56px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(18, 24, 38, 0.85) !important;
+  backdrop-filter: blur(12px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.breadcrumb :deep(.ant-breadcrumb-link),
+.breadcrumb :deep(.ant-breadcrumb-separator) {
+  color: var(--text-3);
+}
+
+.breadcrumb :deep(a) {
+  color: var(--text-2);
+}
+
+.breadcrumb :deep(a:hover) {
+  color: var(--primary);
+}
+
+.breadcrumb :deep(li:last-child) {
+  color: var(--text-1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(91, 140, 255, 0.18);
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.user-role {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.account-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text-1);
 }
 
 .content {
-  margin: 16px;
-  padding: 16px;
-  background: #fff;
-  min-height: calc(100vh - 96px);
+  padding: 24px;
+  min-height: calc(100vh - 56px);
+  background: var(--bg-base);
 }
 </style>

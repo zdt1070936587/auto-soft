@@ -3,7 +3,9 @@ package com.autosoft.agent.tool.impl;
 import com.autosoft.agent.tool.AgentTool;
 import com.autosoft.agent.tool.ToolArgs;
 import com.autosoft.agent.tool.ToolContext;
+import com.autosoft.agent.tool.ToolRegistry;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,6 +13,12 @@ import java.util.Map;
 
 @Component
 public class AskUserTool implements AgentTool {
+
+    private final JsonMapper jsonMapper;
+
+    public AskUserTool(JsonMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
+    }
 
     @Override
     public String name() {
@@ -31,10 +39,9 @@ public class AskUserTool implements AgentTool {
 
     @Override
     public String execute(ToolContext context, ToolArgs args) {
-        return "{\"asked\":true,\"question\":\"" + escape(args.requireStr("question")) + "\"}";
-    }
-
-    private static String escape(String text) {
-        return text.replace("\\", "\\\\").replace("\"", "\\\"");
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("asked", true);
+        payload.put("question", args.requireStr("question"));
+        return ToolRegistry.json(jsonMapper, payload);
     }
 }

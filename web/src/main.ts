@@ -1,11 +1,21 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import Antd from 'ant-design-vue'
+import Antd, { message } from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css'
+import '@/styles/global.css'
 import App from './App.vue'
 import router from './router'
 import { setupRouterGuards } from './router/guards'
 import { setUnauthorizedHandler } from './api/http'
+import { migrateLegacyToken } from './utils/token'
+
+migrateLegacyToken()
+
+message.config({
+  top: '48px',
+  duration: 3,
+  maxCount: 3,
+})
 
 const app = createApp(App)
 app.use(createPinia())

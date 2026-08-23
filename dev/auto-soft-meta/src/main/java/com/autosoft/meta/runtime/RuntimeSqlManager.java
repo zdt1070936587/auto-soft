@@ -14,8 +14,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,7 +77,7 @@ public class RuntimeSqlManager {
                 continue;
             }
             cols.add(Identifiers.quote(field.getCode()));
-            params.addValue(field.getCode(), convert(field, body.get(field.getCode())));
+            bind(params, field, body.get(field.getCode()));
         }
         cols.add(Identifiers.quote("created_by"));
         cols.add(Identifiers.quote("created_at"));
@@ -80,12 +85,12 @@ public class RuntimeSqlManager {
         cols.add(Identifiers.quote("updated_at"));
         cols.add(Identifiers.quote("deleted"));
         cols.add(Identifiers.quote("flow_status"));
-        params.addValue("created_by", userId);
-        params.addValue("created_at", Timestamp.from(now));
-        params.addValue("updated_by", userId);
-        params.addValue("updated_at", Timestamp.from(now));
-        params.addValue("deleted", 0);
-        params.addValue("flow_status", flowStatus);
+        params.addValue("created_by", userId, Types.BIGINT);
+        params.addValue("created_at", Timestamp.from(now), Types.TIMESTAMP);
+        params.addValue("updated_by", userId, Types.BIGINT);
+        params.addValue("updated_at", Timestamp.from(now), Types.TIMESTAMP);
+        params.addValue("deleted", 0, Types.SMALLINT);
+        params.addValue("flow_status", flowStatus, Types.VARCHAR);
         StringBuilder sql = new StringBuilder("INSERT INTO ").append(Identifiers.quoteTable(table)).append(" (");
         sql.append(String.join(",", cols)).append(") VALUES (");
         List<String> holders = new ArrayList<>();
@@ -112,12 +117,12 @@ public class RuntimeSqlManager {
                 continue;
             }
             sets.add(Identifiers.quote(field.getCode()) + " = :" + field.getCode());
-            params.addValue(field.getCode(), convert(field, body.get(field.getCode())));
+            bind(params, field, body.get(field.getCode()));
         }
         sets.add(Identifiers.quote("updated_by") + " = :updated_by");
         sets.add(Identifiers.quote("updated_at") + " = :updated_at");
-        params.addValue("updated_by", SecurityUtils.currentUserId());
-        params.addValue("updated_at", Timestamp.from(Instant.now()));
+        params.addValue("updated_by", SecurityUtils.currentUserId(), Types.BIGINT);
+        params.addValue("updated_at", Timestamp.from(Instant.now()), Types.TIMESTAMP);
         if (sets.size() == 2) {
             return;
         }
@@ -178,11 +183,20 @@ public class RuntimeSqlManager {
             if (FieldTypes.STRING.equals(type) || FieldTypes.TEXT.equals(type) || FieldTypes.DICT.equals(type)) {
                 where.append(" AND ").append(Identifiers.quote(field.getCode()))
                         .append(" LIKE :q_").append(field.getCode()).append(" ");
-                params.addValue("q_" + field.getCode(), "%" + entry.getValue() + "%");
+                params.addValue("q_" + field.getCode(), "%" + entry.getValue() + "%", Types.VARCHAR);
             } else {
                 where.append(" AND ").append(Identifiers.quote(field.getCode()))
                         .append(" = :q_").append(field.getCode()).append(" ");
-                params.addValue("q_" + field.getCode(), convert(field, entry.getValue()));
+                Object value = convert(field, entry.getValue());
+                int sqlType = switch (type) {
+                    case FieldTypes.INT, FieldTypes.BOOL -> Types.INTEGER;
+                    case FieldTypes.LONG, FieldTypes.REF -> Types.BIGINT;
+                    case FieldTypes.DECIMAL -> Types.NUMERIC;
+                    case FieldTypes.DATE -> Types.DATE;
+                    case FieldTypes.DATETIME -> Types.TIMESTAMP;
+                    default -> Types.VARCHAR;
+                };
+                params.addValue("q_" + field.getCode(), value, sqlType);
             }
         }
     }
@@ -201,23 +215,110 @@ public class RuntimeSqlManager {
         return Identifiers.quote(col) + " " + dir;
     }
 
+    private void bind(MapSqlParameterSource params, MetaFieldDO field, Object raw) {
+        Object value = convert(field, raw);
+        String type = FieldTypes.require(field.getFieldType());
+        int sqlType = switch (type) {
+            case FieldTypes.INT, FieldTypes.BOOL -> Types.INTEGER;
+            case FieldTypes.LONG, FieldTypes.REF -> Types.BIGINT;
+            case FieldTypes.DECIMAL -> Types.NUMERIC;
+            case FieldTypes.DATE -> Types.DATE;
+            case FieldTypes.DATETIME -> Types.TIMESTAMP;
+            default -> Types.VARCHAR;
+        };
+        params.addValue(field.getCode(), value, sqlType);
+    }
+
     private Object convert(MetaFieldDO field, Object raw) {
         if (raw == null || (raw instanceof String s && s.isBlank())) {
             return null;
         }
         String type = FieldTypes.require(field.getFieldType());
-        String text = String.valueOf(raw);
-        return switch (type) {
-            case FieldTypes.INT -> Integer.valueOf(text);
-            case FieldTypes.LONG, FieldTypes.REF -> Long.valueOf(text);
-            case FieldTypes.DECIMAL -> new java.math.BigDecimal(text);
-            case FieldTypes.BOOL -> {
-                if ("true".equalsIgnoreCase(text) || "1".equals(text)) {
-                    yield 1;
-                }
-                yield 0;
+        if (raw instanceof Date || raw instanceof Timestamp || raw instanceof LocalDate
+                || raw instanceof Instant || raw instanceof OffsetDateTime
+                || raw instanceof Number || raw instanceof Boolean) {
+            if (FieldTypes.DATE.equals(type)) {
+                return toSqlDate(raw, field.getCode());
             }
-            default -> text;
-        };
+            if (FieldTypes.DATETIME.equals(type)) {
+                return toSqlTimestamp(raw, field.getCode());
+            }
+        }
+        String text = String.valueOf(raw).trim();
+        try {
+            return switch (type) {
+                case FieldTypes.INT -> Integer.valueOf(text);
+                case FieldTypes.LONG, FieldTypes.REF -> Long.valueOf(text);
+                case FieldTypes.DECIMAL -> new java.math.BigDecimal(text);
+                case FieldTypes.BOOL -> {
+                    if ("true".equalsIgnoreCase(text) || "1".equals(text)) {
+                        yield 1;
+                    }
+                    yield 0;
+                }
+                case FieldTypes.DATE -> toSqlDate(text, field.getCode());
+                case FieldTypes.DATETIME -> toSqlTimestamp(text, field.getCode());
+                default -> text;
+            };
+        } catch (NumberFormatException ex) {
+            throw new BizException(ResultCode.BAD_REQUEST, "字段 " + field.getCode() + " 数值格式不正确");
+        }
+    }
+
+    private Date toSqlDate(Object raw, String fieldCode) {
+        try {
+            if (raw instanceof Date date) {
+                return date;
+            }
+            if (raw instanceof LocalDate localDate) {
+                return Date.valueOf(localDate);
+            }
+            if (raw instanceof Timestamp timestamp) {
+                return Date.valueOf(timestamp.toLocalDateTime().toLocalDate());
+            }
+            if (raw instanceof Instant instant) {
+                return Date.valueOf(LocalDate.ofInstant(instant, java.time.ZoneOffset.UTC));
+            }
+            String text = String.valueOf(raw).trim();
+            if (text.length() >= 10 && text.charAt(4) == '-') {
+                return Date.valueOf(LocalDate.parse(text.substring(0, 10)));
+            }
+            return Date.valueOf(LocalDate.parse(text));
+        } catch (DateTimeParseException | IllegalArgumentException ex) {
+            throw new BizException(ResultCode.BAD_REQUEST, "字段 " + fieldCode + " 日期格式不正确，需 YYYY-MM-DD");
+        }
+    }
+
+    private Timestamp toSqlTimestamp(Object raw, String fieldCode) {
+        try {
+            if (raw instanceof Timestamp timestamp) {
+                return timestamp;
+            }
+            if (raw instanceof Instant instant) {
+                return Timestamp.from(instant);
+            }
+            if (raw instanceof OffsetDateTime odt) {
+                return Timestamp.from(odt.toInstant());
+            }
+            if (raw instanceof Date date) {
+                return new Timestamp(date.getTime());
+            }
+            String text = String.valueOf(raw).trim();
+            if (text.length() == 10 && text.charAt(4) == '-') {
+                return Timestamp.valueOf(LocalDate.parse(text).atStartOfDay());
+            }
+            if (text.endsWith("Z")) {
+                return Timestamp.from(Instant.parse(text));
+            }
+            if (text.contains("T") && (text.contains("+") || text.matches(".*-\\d{2}:\\d{2}$"))) {
+                return Timestamp.from(OffsetDateTime.parse(text).toInstant());
+            }
+            if (text.contains("T")) {
+                return Timestamp.valueOf(java.time.LocalDateTime.parse(text));
+            }
+            return Timestamp.valueOf(text);
+        } catch (DateTimeParseException | IllegalArgumentException ex) {
+            throw new BizException(ResultCode.BAD_REQUEST, "字段 " + fieldCode + " 时间格式不正确");
+        }
     }
 }
