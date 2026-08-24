@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import java.time.Duration;
 
 @Configuration
-@EnableConfigurationProperties({CryptoProperties.class, OpenCodeProperties.class})
+@EnableConfigurationProperties({CryptoProperties.class, OpenCodeProperties.class, StudioUploadProperties.class})
 public class AgentConfig {
 
     @Bean

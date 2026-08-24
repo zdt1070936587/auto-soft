@@ -9,6 +9,7 @@ public class MetaAppSaveDTO {
     private String name;
     private String grantRoles;
     private String remark;
+    private String appKind;
 
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
@@ -18,4 +19,6 @@ public class MetaAppSaveDTO {
     public void setGrantRoles(String grantRoles) { this.grantRoles = grantRoles; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+    public String getAppKind() { return appKind; }
+    public void setAppKind(String appKind) { this.appKind = appKind; }
 }

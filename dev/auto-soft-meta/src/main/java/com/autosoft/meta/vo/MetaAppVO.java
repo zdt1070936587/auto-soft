@@ -11,7 +11,9 @@ public class MetaAppVO {
     private Integer version;
     private String grantRoles;
     private String remark;
+    private String appKind;
     private List<MetaEntityVO> entities = new ArrayList<>();
+    private List<MetaPageVO> pages = new ArrayList<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -27,6 +29,10 @@ public class MetaAppVO {
     public void setGrantRoles(String grantRoles) { this.grantRoles = grantRoles; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+    public String getAppKind() { return appKind; }
+    public void setAppKind(String appKind) { this.appKind = appKind; }
     public List<MetaEntityVO> getEntities() { return entities; }
     public void setEntities(List<MetaEntityVO> entities) { this.entities = entities; }
+    public List<MetaPageVO> getPages() { return pages; }
+    public void setPages(List<MetaPageVO> pages) { this.pages = pages; }
 }

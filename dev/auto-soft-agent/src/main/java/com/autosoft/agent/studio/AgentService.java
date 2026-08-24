@@ -1,5 +1,7 @@
 package com.autosoft.agent.studio;
 
+import com.autosoft.agent.dto.ChatMessageDTO;
+import com.autosoft.agent.entity.AiAttachmentDO;
 import com.autosoft.agent.entity.AiMessageDO;
 import com.autosoft.agent.entity.AiSessionDO;
 import com.autosoft.agent.entity.AiToolLogDO;
@@ -28,6 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 对话编排。主方法只写步骤。
@@ -44,18 +47,23 @@ public class AgentService {
     private final OpenCodeGoManager openCodeGoManager;
     private final ToolRegistry toolRegistry;
     private final JsonMapper jsonMapper;
+    private final TurnPauseRegistry pauseRegistry;
+    private final StudioAttachmentService attachmentService;
 
     public AgentService(AiSessionMapper sessionMapper, AiMessageMapper messageMapper, AiToolLogMapper toolLogMapper,
-                        OpenCodeGoManager openCodeGoManager, ToolRegistry toolRegistry, JsonMapper jsonMapper) {
+                        OpenCodeGoManager openCodeGoManager, ToolRegistry toolRegistry, JsonMapper jsonMapper,
+                        TurnPauseRegistry pauseRegistry, StudioAttachmentService attachmentService) {
         this.sessionMapper = sessionMapper;
         this.messageMapper = messageMapper;
         this.toolLogMapper = toolLogMapper;
         this.openCodeGoManager = openCodeGoManager;
         this.toolRegistry = toolRegistry;
         this.jsonMapper = jsonMapper;
+        this.pauseRegistry = pauseRegistry;
+        this.attachmentService = attachmentService;
     }
 
-    public SseEmitter startTurn(Long sessionId, String userText) {
+    public SseEmitter startTurn(Long sessionId, ChatMessageDTO dto) {
         SseEmitter emitter = new SseEmitter(300_000L);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         java.util.Map<String, String> mdc = org.slf4j.MDC.getCopyOfContextMap();
@@ -65,8 +73,9 @@ public class AgentService {
             }
             SecurityContextHolder.getContext().setAuthentication(authentication);
             try {
-                runTurn(sessionId, userText, emitter);
+                runTurn(sessionId, dto, emitter);
             } finally {
+                pauseRegistry.clear(sessionId);
                 SecurityContextHolder.clearContext();
                 org.slf4j.MDC.clear();
             }
@@ -74,25 +83,40 @@ public class AgentService {
         return emitter;
     }
 
-    public void runTurn(Long sessionId, String userText, SseEmitter emitter) {
+    public void requestPause(Long sessionId) {
+        pauseRegistry.requestPause(sessionId);
+    }
+
+    public void runTurn(Long sessionId, ChatMessageDTO dto, SseEmitter emitter) {
         try {
-            // 1. 加载会话
             AiSessionDO session = loadSession(sessionId);
-            AssertUtils.notBlank(userText, "消息不能为空");
-            persistMessage(sessionId, "user", userText, null, null);
+            AssertUtils.notBlank(dto == null ? null : dto.getMessage(), "消息不能为空");
+            pauseRegistry.clear(sessionId);
+            applyMode(session, dto == null ? null : dto.getAgentMode());
+            AgentMode mode = currentMode(session);
+
+            List<Long> attachmentIds = dto == null || dto.getAttachmentIds() == null
+                    ? List.of() : dto.getAttachmentIds();
+            List<AiAttachmentDO> attachments = attachmentService.requireForSend(sessionId, attachmentIds);
+            String userText = dto.getMessage().trim();
+            String persistContent = attachmentService.buildPersistContent(userText, attachments);
+            Long userMessageId = persistMessage(sessionId, "user", persistContent, null, null);
+            attachmentService.linkToMessage(sessionId, userMessageId, attachmentIds);
             maybeTitle(session, userText);
-            // 2. 组装提示
-            List<Map<String, Object>> messages = loadModelMessages(sessionId);
-            // 3-4. 调模型并执行工具
-            boolean finished = loopModel(session, messages, emitter);
-            if (!finished) {
+
+            List<Map<String, Object>> messages = loadModelMessages(sessionId, mode);
+            TurnOutcome outcome = loopModel(session, mode, messages, emitter);
+            if (outcome == TurnOutcome.PAUSED) {
+                return;
+            }
+            if (outcome == TurnOutcome.INCOMPLETE) {
                 emit(emitter, "error", Map.of("message", "请缩短需求或手动在应用建模里改"));
             }
-            // 5. 结束
             emit(emitter, "done", Map.of(
                     "sessionId", sessionId,
                     "tokenInput", nvl(session.getTokenInput()),
-                    "tokenOutput", nvl(session.getTokenOutput())));
+                    "tokenOutput", nvl(session.getTokenOutput()),
+                    "agentMode", mode.code()));
             emitter.complete();
         } catch (BizException ex) {
             emit(emitter, "error", Map.of("message", ex.getMessage()));
@@ -104,23 +128,32 @@ public class AgentService {
         }
     }
 
-    private boolean loopModel(AiSessionDO session, List<Map<String, Object>> messages, SseEmitter emitter) {
-        List<Map<String, Object>> tools = toolRegistry.openaiTools();
+    private enum TurnOutcome {
+        COMPLETE, PAUSED, INCOMPLETE
+    }
+
+    private TurnOutcome loopModel(AiSessionDO session, AgentMode mode, List<Map<String, Object>> messages,
+                                  SseEmitter emitter) {
+        List<Map<String, Object>> tools = toolRegistry.openaiTools(mode);
         for (int i = 0; i < MAX_TOOL_LOOPS; i++) {
+            if (pauseRegistry.consumePause(session.getId())) {
+                finishPaused(session, emitter);
+                return TurnOutcome.PAUSED;
+            }
             LlmTurn turn = openCodeGoManager.chat(messages, tools);
             addTokens(session, turn);
             if (!turn.hasToolCalls()) {
                 String text = turn.getContent() == null ? "" : turn.getContent();
                 persistMessage(session.getId(), "assistant", text, null, null);
                 emit(emitter, "text", Map.of("content", text));
-                return true;
+                return TurnOutcome.COMPLETE;
             }
             persistToolCalls(session.getId(), turn);
             messages.add(assistantToolCallMessage(turn));
             ToolContext context = new ToolContext(session, sessionMapper);
             boolean askedUser = false;
             for (LlmTurn.ToolCall call : turn.getToolCalls()) {
-                if (executeOneTool(session, context, call, messages, emitter)) {
+                if (executeOneTool(session, mode, context, call, messages, emitter)) {
                     askedUser = true;
                 }
             }
@@ -128,17 +161,27 @@ public class AgentService {
                 emit(emitter, "schema_updated", Map.of("appId", nvl(session.getAppId())));
             }
             if (askedUser) {
-                // 等待用户确认后再开新 turn，避免确认已出仍继续调模型
-                return true;
+                return TurnOutcome.COMPLETE;
+            }
+            if (pauseRegistry.consumePause(session.getId())) {
+                finishPaused(session, emitter);
+                return TurnOutcome.PAUSED;
             }
         }
-        return false;
+        return TurnOutcome.INCOMPLETE;
+    }
+
+    private void finishPaused(AiSessionDO session, SseEmitter emitter) {
+        String text = "已暂停。当前步骤内已完成的修改已保留，你可以补充意见后继续。";
+        persistMessage(session.getId(), "assistant", text, null, null);
+        emit(emitter, "paused", Map.of("message", text));
+        emitter.complete();
     }
 
     /**
      * @return true 表示本工具为 ask_user，调用方应结束本轮
      */
-    private boolean executeOneTool(AiSessionDO session, ToolContext context, LlmTurn.ToolCall call,
+    private boolean executeOneTool(AiSessionDO session, AgentMode mode, ToolContext context, LlmTurn.ToolCall call,
                                    List<Map<String, Object>> messages, SseEmitter emitter) {
         emit(emitter, "tool_start", Map.of("tool", nz(call.getName()), "arguments", nz(call.getArgumentsJson())));
         long start = System.currentTimeMillis();
@@ -146,7 +189,7 @@ public class AgentService {
         String error = null;
         String result;
         try {
-            result = toolRegistry.execute(call.getName(), context, call.getArgumentsJson());
+            result = toolRegistry.execute(call.getName(), context, call.getArgumentsJson(), mode);
         } catch (BizException ex) {
             ok = false;
             error = ex.getMessage();
@@ -168,6 +211,19 @@ public class AgentService {
         persistMessage(session.getId(), "assistant", question, "ask_user", null);
         emit(emitter, "ask_user", Map.of("question", question));
         return true;
+    }
+
+    private void applyMode(AiSessionDO session, String requestedMode) {
+        if (requestedMode == null || requestedMode.isBlank()) {
+            return;
+        }
+        AgentMode mode = AgentMode.from(requestedMode);
+        session.setAgentMode(mode.code());
+        sessionMapper.updateById(session);
+    }
+
+    private AgentMode currentMode(AiSessionDO session) {
+        return AgentMode.from(session.getAgentMode());
     }
 
     private String extractAskUserQuestion(String argumentsJson) {
@@ -195,14 +251,22 @@ public class AgentService {
         return session;
     }
 
-    private List<Map<String, Object>> loadModelMessages(Long sessionId) {
+    private List<Map<String, Object>> loadModelMessages(Long sessionId, AgentMode mode) {
         List<AiMessageDO> rows = messageMapper.selectList(new LambdaQueryWrapper<AiMessageDO>()
                 .eq(AiMessageDO::getSessionId, sessionId).orderByAsc(AiMessageDO::getId));
         if (rows.size() > PromptBuilder.HISTORY_LIMIT) {
             rows = rows.subList(rows.size() - PromptBuilder.HISTORY_LIMIT, rows.size());
         }
+        List<Long> userMessageIds = rows.stream()
+                .filter(msg -> "user".equals(msg.getRole()))
+                .map(AiMessageDO::getId)
+                .toList();
+        Map<Long, List<AiAttachmentDO>> attachmentsByMessage = attachmentService.listByMessageIds(userMessageIds)
+                .stream()
+                .collect(Collectors.groupingBy(AiAttachmentDO::getMessageId));
+
         List<Map<String, Object>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "system", "content", PromptBuilder.systemPrompt()));
+        messages.add(Map.of("role", "system", "content", PromptBuilder.systemPrompt(mode)));
         for (AiMessageDO msg : rows) {
             if ("__tool_calls".equals(msg.getToolName())) {
                 Map<String, Object> item = new LinkedHashMap<>();
@@ -211,11 +275,26 @@ public class AgentService {
                 item.put("tool_calls", jsonMapper.readValue(msg.getContent(), new TypeReference<List<Map<String, Object>>>() {
                 }));
                 messages.add(item);
+            } else if ("user".equals(msg.getRole())) {
+                List<AiAttachmentDO> linked = attachmentsByMessage.getOrDefault(msg.getId(), List.of());
+                messages.add(attachmentService.buildUserMessageFromStored(msg.getContent(), linked));
             } else {
                 messages.add(PromptBuilder.toOpenAi(msg));
             }
         }
         return messages;
+    }
+
+    private Long persistMessage(Long sessionId, String role, String content, String toolName, String toolCallId) {
+        AiMessageDO row = new AiMessageDO();
+        row.setSessionId(sessionId);
+        row.setRole(role);
+        row.setContent(content);
+        row.setToolName(toolName);
+        row.setToolCallId(toolCallId);
+        row.setTokens(0);
+        messageMapper.insert(row);
+        return row.getId();
     }
 
     private void persistToolCalls(Long sessionId, LlmTurn turn) {
@@ -259,17 +338,6 @@ public class AgentService {
         item.put("name", call.getName());
         item.put("content", result);
         return item;
-    }
-
-    private void persistMessage(Long sessionId, String role, String content, String toolName, String toolCallId) {
-        AiMessageDO row = new AiMessageDO();
-        row.setSessionId(sessionId);
-        row.setRole(role);
-        row.setContent(content);
-        row.setToolName(toolName);
-        row.setToolCallId(toolCallId);
-        row.setTokens(0);
-        messageMapper.insert(row);
     }
 
     private void saveToolLog(Long sessionId, LlmTurn.ToolCall call, String result, boolean ok, String error, int cost) {

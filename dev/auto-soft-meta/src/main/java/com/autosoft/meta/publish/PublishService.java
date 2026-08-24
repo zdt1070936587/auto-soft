@@ -4,6 +4,7 @@ import com.autosoft.common.core.ResultCode;
 import com.autosoft.common.exception.BizException;
 import com.autosoft.common.utils.AssertUtils;
 import com.autosoft.framework.log.OperLog;
+import com.autosoft.meta.app.AppKind;
 import com.autosoft.meta.app.MetaCatalogService;
 import com.autosoft.meta.ddl.DdlManager;
 import com.autosoft.meta.dto.PublishDTO;
@@ -11,8 +12,10 @@ import com.autosoft.meta.entity.MetaAppDO;
 import com.autosoft.meta.entity.MetaAppMenuDO;
 import com.autosoft.meta.entity.MetaEntityDO;
 import com.autosoft.meta.entity.MetaFieldDO;
+import com.autosoft.meta.entity.MetaPageDO;
 import com.autosoft.meta.mapper.MetaAppMapper;
 import com.autosoft.meta.mapper.MetaAppMenuMapper;
+import com.autosoft.meta.page.LowCodeSchemaValidator;
 import com.autosoft.system.entity.MenuDO;
 import com.autosoft.system.entity.RoleDO;
 import com.autosoft.system.entity.RoleMenuDO;
@@ -29,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 发布：先 DDL，失败保持 DRAFT。
+ * 发布：admin 先 DDL；frontend/h5 跳过低代码页 DDL。
  */
 @Service
 public class PublishService {
@@ -60,22 +63,37 @@ public class PublishService {
     @Transactional(rollbackFor = Exception.class)
     public void publish(Long appId, PublishDTO dto) {
         MetaAppDO app = catalogService.requireApp(appId);
+        AppKind kind = AppKind.from(app.getAppKind());
         List<MetaEntityDO> entities = catalogService.listEntities(appId);
-        AssertUtils.isTrue(!entities.isEmpty(), "至少需要一个实体");
-        for (MetaEntityDO entity : entities) {
-            List<MetaFieldDO> fields = catalogService.listFields(entity.getId());
-            AssertUtils.isTrue(!fields.isEmpty(), "实体 " + entity.getName() + " 至少需要一个字段");
-            try {
-                ddlManager.ensureTable(app.getCode(), entity.getCode(), fields);
-            } catch (RuntimeException ex) {
-                log.error("ddl failed for {} {}", app.getCode(), entity.getCode(), ex);
-                throw new BizException(ResultCode.SERVER_ERROR, "建表失败，应用仍为草稿：" + ex.getMessage());
+        List<MetaPageDO> pages = catalogService.listAppPages(appId);
+
+        if (kind.needsDdl()) {
+            AssertUtils.isTrue(!entities.isEmpty(), "至少需要一个实体");
+            for (MetaEntityDO entity : entities) {
+                List<MetaFieldDO> fields = catalogService.listFields(entity.getId());
+                AssertUtils.isTrue(!fields.isEmpty(), "实体 " + entity.getName() + " 至少需要一个字段");
+                try {
+                    ddlManager.ensureTable(app.getCode(), entity.getCode(), fields);
+                } catch (RuntimeException ex) {
+                    log.error("ddl failed for {} {}", app.getCode(), entity.getCode(), ex);
+                    throw new BizException(ResultCode.SERVER_ERROR, "建表失败，应用仍为草稿：" + ex.getMessage());
+                }
             }
+            upsertAdminMenus(app, entities);
+        } else {
+            List<MetaPageDO> lowCodePages = pages.stream()
+                    .filter(page -> MetaCatalogService.PAGE_TYPE_PAGE.equals(page.getPageType()))
+                    .toList();
+            AssertUtils.isTrue(!lowCodePages.isEmpty(), "至少需要一个低代码页面");
+            for (MetaPageDO page : lowCodePages) {
+                LowCodeSchemaValidator.validate(page.getSchemaJson());
+            }
+            upsertLowCodeMenus(app, lowCodePages, kind);
         }
+
         if (dto != null && dto.getGrantRoles() != null && !dto.getGrantRoles().isBlank()) {
             app.setGrantRoles(dto.getGrantRoles());
         }
-        upsertMenus(app, entities);
         app.setStatus(MetaAppDO.PUBLISHED);
         app.setVersion(app.getVersion() == null ? 1 : app.getVersion() + 1);
         appMapper.updateById(app);
@@ -98,7 +116,7 @@ public class PublishService {
         appMapper.updateById(app);
     }
 
-    private void upsertMenus(MetaAppDO app, List<MetaEntityDO> entities) {
+    private void upsertAdminMenus(MetaAppDO app, List<MetaEntityDO> entities) {
         String dirPath = "/app/" + app.getCode();
         MenuDO dir = menuMapper.selectOne(new LambdaQueryWrapper<MenuDO>().eq(MenuDO::getPath, dirPath));
         if (dir == null) {
@@ -132,6 +150,45 @@ public class PublishService {
             upsertButton(app.getId(), menu.getId(), "修改", perm(app.getCode(), entity.getCode(), "update"), 30);
             upsertButton(app.getId(), menu.getId(), "删除", perm(app.getCode(), entity.getCode(), "delete"), 40);
             upsertButton(app.getId(), menu.getId(), "提交", perm(app.getCode(), entity.getCode(), "submit"), 50);
+        }
+        grantRoles(app);
+    }
+
+    private void upsertLowCodeMenus(MetaAppDO app, List<MetaPageDO> pages, AppKind kind) {
+        String prefix = kind == AppKind.H5 ? "/h5" : "/page";
+        String dirPath = prefix + "/" + app.getCode();
+        MenuDO dir = menuMapper.selectOne(new LambdaQueryWrapper<MenuDO>().eq(MenuDO::getPath, dirPath));
+        if (dir == null) {
+            dir = newMenu(0L, app.getName(), dirPath, MenuDO.TYPE_DIR, null, 80);
+            menuMapper.insert(dir);
+            saveLink(app.getId(), dir.getId());
+        } else {
+            dir.setName(app.getName());
+            dir.setVisible(1);
+            dir.setStatus(1);
+            menuMapper.updateById(dir);
+        }
+        int sort = 10;
+        for (MetaPageDO page : pages) {
+            String path = dirPath + "/" + page.getPageCode();
+            String viewPerm = pagePerm(app.getCode(), page.getPageCode());
+            String title = LowCodeSchemaValidator.extractTitle(page.getSchemaJson());
+            String menuName = title == null || title.isBlank() ? page.getPageCode() : title;
+            MenuDO menu = menuMapper.selectOne(new LambdaQueryWrapper<MenuDO>().eq(MenuDO::getPath, path));
+            if (menu == null) {
+                menu = newMenu(dir.getId(), menuName, path, MenuDO.TYPE_MENU, viewPerm, sort);
+                menu.setComponent("LowCodePageView");
+                menuMapper.insert(menu);
+                saveLink(app.getId(), menu.getId());
+            } else {
+                menu.setName(menuName);
+                menu.setVisible(1);
+                menu.setStatus(1);
+                menu.setParentId(dir.getId());
+                menu.setPermission(viewPerm);
+                menuMapper.updateById(menu);
+            }
+            sort += 10;
         }
         grantRoles(app);
     }
@@ -202,5 +259,9 @@ public class PublishService {
 
     private String perm(String app, String entity, String action) {
         return "app:" + app + ":" + entity + ":" + action;
+    }
+
+    private String pagePerm(String app, String page) {
+        return "app:" + app + ":page:" + page + ":view";
     }
 }

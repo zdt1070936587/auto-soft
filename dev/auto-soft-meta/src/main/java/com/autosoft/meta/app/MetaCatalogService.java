@@ -17,9 +17,11 @@ import com.autosoft.meta.mapper.MetaAppMapper;
 import com.autosoft.meta.mapper.MetaEntityMapper;
 import com.autosoft.meta.mapper.MetaFieldMapper;
 import com.autosoft.meta.mapper.MetaPageMapper;
+import com.autosoft.meta.page.LowCodeSchemaValidator;
 import com.autosoft.meta.vo.MetaAppVO;
 import com.autosoft.meta.vo.MetaEntityVO;
 import com.autosoft.meta.vo.MetaFieldVO;
+import com.autosoft.meta.vo.MetaPageVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,8 @@ import java.util.List;
  */
 @Service
 public class MetaCatalogService {
+
+    public static final String PAGE_TYPE_PAGE = "PAGE";
 
     private final MetaAppMapper appMapper;
     private final MetaEntityMapper entityMapper;
@@ -58,6 +62,7 @@ public class MetaCatalogService {
             ev.setFields(listFields(entity.getId()).stream().map(this::toFieldVo).toList());
             return ev;
         }).toList());
+        vo.setPages(listAppPages(appId).stream().map(this::toPageVo).toList());
         return vo;
     }
 
@@ -100,6 +105,23 @@ public class MetaCatalogService {
                 .eq(MetaEntityDO::getAppId, appId).orderByAsc(MetaEntityDO::getId));
     }
 
+    public List<MetaPageDO> listAppPages(Long appId) {
+        return pageMapper.selectList(new LambdaQueryWrapper<MetaPageDO>()
+                .eq(MetaPageDO::getAppId, appId)
+                .orderByAsc(MetaPageDO::getId));
+    }
+
+    public MetaPageDO requirePage(String appCode, String pageCode) {
+        MetaAppDO app = requireAppByCode(appCode);
+        MetaPageDO page = pageMapper.selectOne(new LambdaQueryWrapper<MetaPageDO>()
+                .eq(MetaPageDO::getAppId, app.getId())
+                .eq(MetaPageDO::getPageCode, pageCode));
+        if (page == null) {
+            throw new BizException(ResultCode.NOT_FOUND, "页面不存在");
+        }
+        return page;
+    }
+
     public List<MetaFieldDO> listFields(Long entityId) {
         return fieldMapper.selectList(new LambdaQueryWrapper<MetaFieldDO>()
                 .eq(MetaFieldDO::getEntityId, entityId).orderByAsc(MetaFieldDO::getSort).orderByAsc(MetaFieldDO::getId));
@@ -118,6 +140,7 @@ public class MetaCatalogService {
         app.setVersion(0);
         app.setGrantRoles(dto.getGrantRoles() == null || dto.getGrantRoles().isBlank() ? "USER" : dto.getGrantRoles());
         app.setRemark(dto.getRemark());
+        app.setAppKind(AppKind.from(dto.getAppKind()).code());
         appMapper.insert(app);
         return app.getId();
     }
@@ -135,7 +158,16 @@ public class MetaCatalogService {
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteApp(Long id) {
-        requireApp(id);
+        MetaAppDO app = requireApp(id);
+        if (MetaAppDO.PUBLISHED.equals(app.getStatus())) {
+            throw new BizException(ResultCode.BAD_REQUEST, "已发布应用请先取消发布再删除");
+        }
+        for (MetaEntityDO entity : listEntities(id)) {
+            fieldMapper.delete(new LambdaQueryWrapper<MetaFieldDO>().eq(MetaFieldDO::getEntityId, entity.getId()));
+            pageMapper.delete(new LambdaQueryWrapper<MetaPageDO>().eq(MetaPageDO::getEntityId, entity.getId()));
+            entityMapper.deleteById(entity.getId());
+        }
+        pageMapper.delete(new LambdaQueryWrapper<MetaPageDO>().eq(MetaPageDO::getAppId, id));
         appMapper.deleteById(id);
     }
 
@@ -216,6 +248,30 @@ public class MetaCatalogService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    public void saveAppPage(Long appId, String pageCode, String layout, String schemaJson) {
+        requireApp(appId);
+        Identifiers.assertCode(pageCode, "pageCode");
+        AssertUtils.isTrue(layout != null && !layout.isBlank(), "layout 不能为空");
+        LowCodeSchemaValidator.validate(schemaJson);
+        MetaPageDO page = pageMapper.selectOne(new LambdaQueryWrapper<MetaPageDO>()
+                .eq(MetaPageDO::getAppId, appId)
+                .eq(MetaPageDO::getPageCode, pageCode));
+        if (page == null) {
+            page = new MetaPageDO();
+            page.setAppId(appId);
+            page.setPageCode(pageCode);
+            page.setPageType(PAGE_TYPE_PAGE);
+            page.setLayout(layout);
+            page.setSchemaJson(schemaJson);
+            pageMapper.insert(page);
+            return;
+        }
+        page.setLayout(layout);
+        page.setSchemaJson(schemaJson);
+        pageMapper.updateById(page);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public void savePage(Long entityId, String pageType, PageSchemaDTO dto) {
         requireEntity(entityId);
         AssertUtils.isTrue("LIST".equals(pageType) || "FORM".equals(pageType) || "DETAIL".equals(pageType), "页面类型非法");
@@ -281,6 +337,19 @@ public class MetaCatalogService {
         vo.setVersion(source.getVersion());
         vo.setGrantRoles(source.getGrantRoles());
         vo.setRemark(source.getRemark());
+        vo.setAppKind(source.getAppKind() == null ? AppKind.ADMIN.code() : source.getAppKind());
+        return vo;
+    }
+
+    private MetaPageVO toPageVo(MetaPageDO source) {
+        MetaPageVO vo = new MetaPageVO();
+        vo.setId(source.getId());
+        vo.setAppId(source.getAppId());
+        vo.setEntityId(source.getEntityId());
+        vo.setPageCode(source.getPageCode());
+        vo.setPageType(source.getPageType());
+        vo.setLayout(source.getLayout());
+        vo.setSchemaJson(source.getSchemaJson());
         return vo;
     }
 

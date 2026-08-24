@@ -8,6 +8,7 @@ import UserView from '@/views/system/user/UserView.vue'
 import RoleView from '@/views/system/role/RoleView.vue'
 import MetaAppView from '@/views/meta/MetaAppView.vue'
 import RuntimePageView from '@/views/runtime/RuntimePageView.vue'
+import LowCodePageView from '@/views/runtime/LowCodePageView.vue'
 import StudioView from '@/views/studio/StudioView.vue'
 import LlmSettingView from '@/views/system/LlmSettingView.vue'
 import TodoView from '@/views/flow/TodoView.vue'
@@ -79,6 +80,12 @@ const router = createRouter({
           component: RuntimePageView,
         },
         {
+          path: 'page/:app/:page',
+          name: 'lowcode-page',
+          meta: { title: '工具页面' },
+          component: LowCodePageView,
+        },
+        {
           path: 'studio',
           name: 'studio',
           meta: { title: '功能开发' },
@@ -107,6 +114,18 @@ const router = createRouter({
           name: 'logs',
           meta: { title: '操作日志' },
           component: OperLogView,
+        },
+      ],
+    },
+    {
+      path: '/h5',
+      component: BlankLayout,
+      children: [
+        {
+          path: ':app/:page',
+          name: 'h5-page',
+          meta: { title: 'H5 页面' },
+          component: LowCodePageView,
         },
       ],
     },

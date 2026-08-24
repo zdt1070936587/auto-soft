@@ -1,6 +1,8 @@
 package com.autosoft.agent.vo;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AiMessageVO {
 
@@ -9,6 +11,7 @@ public class AiMessageVO {
     private String content;
     private String toolName;
     private Instant createdAt;
+    private List<AiAttachmentVO> attachments = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -48,5 +51,13 @@ public class AiMessageVO {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<AiAttachmentVO> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<AiAttachmentVO> attachments) {
+        this.attachments = attachments;
     }
 }

@@ -36,6 +36,7 @@ export interface MetaAppVO {
   version: number
   grantRoles: string
   remark?: string
+  appKind?: string
   entities: MetaEntityVO[]
 }
 
@@ -47,6 +48,19 @@ export interface RuntimeSchemaVO {
   published: boolean
   flowBound: boolean
   fields: MetaFieldVO[]
+}
+
+export interface PageViewVO {
+  appCode: string
+  appName: string
+  appKind?: string
+  pageCode?: string
+  pageTitle?: string
+  pageType?: string
+  layout?: string
+  schemaJson?: string
+  published: boolean
+  crudSchema?: RuntimeSchemaVO
 }
 
 export function listMetaApps() {
@@ -63,6 +77,10 @@ export function createMetaApp(payload: { code: string; name: string; grantRoles?
 
 export function updateMetaApp(id: number, payload: { code: string; name: string; grantRoles?: string; remark?: string }) {
   return http.put<ApiResult<void>>(`/meta/apps/${id}`, payload).then(() => undefined)
+}
+
+export function deleteMetaApp(id: number) {
+  return http.delete<ApiResult<void>>(`/meta/apps/${id}`).then(() => undefined)
 }
 
 export function createMetaEntity(appId: number, payload: { code: string; name: string; remark?: string }) {
@@ -87,6 +105,12 @@ export function publishMetaApp(id: number, grantRoles?: string) {
 
 export function unpublishMetaApp(id: number) {
   return http.post<ApiResult<void>>(`/meta/apps/${id}/unpublish`).then(() => undefined)
+}
+
+export function getPageView(app: string, page: string, preview = false) {
+  return http
+    .get<ApiResult<PageViewVO>>(`/runtime/${app}/pages/${page}/view`, { params: { preview } })
+    .then((res) => res.data.data)
 }
 
 export function getRuntimeSchema(app: string, entity: string, preview = false) {

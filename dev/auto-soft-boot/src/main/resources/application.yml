@@ -35,6 +35,8 @@ autosoft:
   opencode:
     base-url: "https://opencode.ai/zen/go/v1"
     timeout-seconds: 120
+  upload:
+    dir: "./data/studio-uploads"
 
 warm-flow:
   enabled: false

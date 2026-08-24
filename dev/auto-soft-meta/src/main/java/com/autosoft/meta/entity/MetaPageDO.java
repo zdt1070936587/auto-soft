@@ -7,6 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 public class MetaPageDO extends BaseDO {
 
     private Long entityId;
+    private Long appId;
+    private String pageCode;
+    private String layout;
     private String pageType;
     private String schemaJson;
 
@@ -16,6 +19,30 @@ public class MetaPageDO extends BaseDO {
 
     public void setEntityId(Long entityId) {
         this.entityId = entityId;
+    }
+
+    public Long getAppId() {
+        return appId;
+    }
+
+    public void setAppId(Long appId) {
+        this.appId = appId;
+    }
+
+    public String getPageCode() {
+        return pageCode;
+    }
+
+    public void setPageCode(String pageCode) {
+        this.pageCode = pageCode;
+    }
+
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
     public String getPageType() {

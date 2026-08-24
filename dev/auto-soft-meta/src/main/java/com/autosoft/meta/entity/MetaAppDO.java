@@ -9,12 +9,15 @@ public class MetaAppDO extends BaseDO {
     public static final String DRAFT = "DRAFT";
     public static final String PUBLISHED = "PUBLISHED";
 
+    public static final String APP_KIND_ADMIN = "admin";
+
     private String code;
     private String name;
     private String status;
     private Integer version;
     private String grantRoles;
     private String remark;
+    private String appKind;
 
     public String getCode() {
         return code;
@@ -62,5 +65,13 @@ public class MetaAppDO extends BaseDO {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getAppKind() {
+        return appKind;
+    }
+
+    public void setAppKind(String appKind) {
+        this.appKind = appKind;
     }
 }

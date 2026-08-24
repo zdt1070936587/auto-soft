@@ -12,6 +12,7 @@ public class AiSessionDO extends BaseDO {
     private String status;
     private Long tokenInput;
     private Long tokenOutput;
+    private String agentMode;
 
     public Long getUserId() {
         return userId;
@@ -59,5 +60,13 @@ public class AiSessionDO extends BaseDO {
 
     public void setTokenOutput(Long tokenOutput) {
         this.tokenOutput = tokenOutput;
+    }
+
+    public String getAgentMode() {
+        return agentMode;
+    }
+
+    public void setAgentMode(String agentMode) {
+        this.agentMode = agentMode;
     }
 }

@@ -48,6 +48,9 @@ function menuIcon(path?: string) {
   if (path.startsWith('/app/')) {
     return AppstoreOutlined
   }
+  if (path.startsWith('/page/')) {
+    return AppstoreOutlined
+  }
   if (path.startsWith('/system') || path.startsWith('/meta') || path.startsWith('/flow')) {
     return SettingOutlined
   }
@@ -83,6 +86,10 @@ function resolveOpenKeys(path: string) {
     const parts = path.split('/')
     return parts.length >= 3 ? [`/app/${parts[2]}`] : []
   }
+  if (path.startsWith('/page/')) {
+    const parts = path.split('/')
+    return parts.length >= 3 ? [`/page/${parts[2]}`] : []
+  }
   return []
 }
 
@@ -95,6 +102,16 @@ const breadcrumbs = computed(() => {
     const parts = route.path.split('/')
     if (parts[2]) {
       items.push({ title: parts[2], path: `/app/${parts[2]}` })
+    }
+    if (parts[3]) {
+      items.push({ title: title || parts[3] })
+    }
+    return items
+  }
+  if (route.path.startsWith('/page/')) {
+    const parts = route.path.split('/')
+    if (parts[2]) {
+      items.push({ title: parts[2], path: `/page/${parts[2]}` })
     }
     if (parts[3]) {
       items.push({ title: title || parts[3] })

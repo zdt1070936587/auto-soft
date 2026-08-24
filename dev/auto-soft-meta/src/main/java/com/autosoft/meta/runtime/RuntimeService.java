@@ -6,11 +6,15 @@ import com.autosoft.common.core.ResultCode;
 import com.autosoft.common.exception.BizException;
 import com.autosoft.framework.security.LoginUser;
 import com.autosoft.framework.security.SecurityUtils;
+import com.autosoft.meta.app.AppKind;
 import com.autosoft.meta.app.MetaCatalogService;
 import com.autosoft.meta.ddl.Identifiers;
 import com.autosoft.meta.entity.MetaAppDO;
 import com.autosoft.meta.entity.MetaEntityDO;
 import com.autosoft.meta.entity.MetaFieldDO;
+import com.autosoft.meta.entity.MetaPageDO;
+import com.autosoft.meta.page.LowCodeSchemaValidator;
+import com.autosoft.meta.vo.PageViewVO;
 import com.autosoft.meta.vo.RuntimeSchemaVO;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +50,59 @@ public class RuntimeService {
         vo.setPublished(MetaAppDO.PUBLISHED.equals(loaded.app.getStatus()));
         vo.setFlowBound(flowHook.bound(appCode, entityCode));
         vo.setFields(loaded.fields.stream().map(catalogService::toFieldVo).toList());
+        return vo;
+    }
+
+    public PageViewVO pageView(String appCode, String pageCode, boolean preview) {
+        Identifiers.assertCode(appCode, "appCode");
+        Identifiers.assertCode(pageCode, "pageCode");
+        MetaAppDO app = catalogService.requireAppByCode(appCode);
+        MetaPageDO page = catalogService.requirePage(appCode, pageCode);
+        LoginUser user = SecurityUtils.requireUser();
+        if (preview) {
+            if (!user.isDeveloper()) {
+                throw new BizException(ResultCode.FORBIDDEN, "仅开发者可预览未发布应用");
+            }
+        } else if (!MetaAppDO.PUBLISHED.equals(app.getStatus()) && !user.isDeveloper()) {
+            throw new BizException(ResultCode.FORBIDDEN, "应用未发布");
+        }
+        String perm = "app:" + appCode + ":page:" + pageCode + ":view";
+        if (!preview && !user.hasPermission(perm) && !user.isDeveloper()) {
+            throw new BizException(ResultCode.FORBIDDEN, "无权限");
+        }
+        PageViewVO vo = new PageViewVO();
+        vo.setAppCode(app.getCode());
+        vo.setAppName(app.getName());
+        vo.setAppKind(app.getAppKind() == null ? AppKind.ADMIN.code() : app.getAppKind());
+        vo.setPageCode(page.getPageCode());
+        vo.setPageType(page.getPageType());
+        vo.setLayout(page.getLayout());
+        vo.setSchemaJson(page.getSchemaJson());
+        vo.setPageTitle(LowCodeSchemaValidator.extractTitle(page.getSchemaJson()));
+        vo.setPublished(MetaAppDO.PUBLISHED.equals(app.getStatus()));
+        return vo;
+    }
+
+    public PageViewVO resolveAppView(String appCode, boolean preview) {
+        MetaAppDO app = catalogService.requireAppByCode(appCode);
+        List<MetaPageDO> pages = catalogService.listAppPages(app.getId());
+        MetaPageDO lowCode = pages.stream()
+                .filter(page -> MetaCatalogService.PAGE_TYPE_PAGE.equals(page.getPageType()))
+                .findFirst()
+                .orElse(null);
+        if (lowCode != null) {
+            return pageView(appCode, lowCode.getPageCode(), preview);
+        }
+        List<MetaEntityDO> entities = catalogService.listEntities(app.getId());
+        if (entities.isEmpty()) {
+            return null;
+        }
+        PageViewVO vo = new PageViewVO();
+        vo.setAppCode(app.getCode());
+        vo.setAppName(app.getName());
+        vo.setAppKind(app.getAppKind() == null ? AppKind.ADMIN.code() : app.getAppKind());
+        vo.setPublished(MetaAppDO.PUBLISHED.equals(app.getStatus()));
+        vo.setCrudSchema(schema(appCode, entities.get(0).getCode(), preview));
         return vo;
     }
 

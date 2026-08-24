@@ -11,6 +11,7 @@ public class AiSessionVO {
     private Long tokenInput;
     private Long tokenOutput;
     private Instant createdAt;
+    private String agentMode;
 
     public Long getId() {
         return id;
@@ -66,5 +67,13 @@ public class AiSessionVO {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getAgentMode() {
+        return agentMode;
+    }
+
+    public void setAgentMode(String agentMode) {
+        this.agentMode = agentMode;
     }
 }
