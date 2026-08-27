@@ -3,7 +3,7 @@ import { message } from 'ant-design-vue'
 import { runLowCodeAction } from './actions'
 import type { LowCodeSchema } from './types'
 
-export function useLowCodeState(schema: () => LowCodeSchema | null) {
+export function useLowCodeState(schema: () => LowCodeSchema | null, options?: { preview?: boolean }) {
   const state = reactive<Record<string, string>>({})
 
   watch(
@@ -23,18 +23,23 @@ export function useLowCodeState(schema: () => LowCodeSchema | null) {
   )
 
   function runAction(action: string, params: Record<string, unknown>) {
-    runLowCodeAction(action, {
-      state,
-      message: (text, type = 'info') => {
-        if (type === 'success') {
-          message.success(text)
-        } else if (type === 'error') {
-          message.error(text)
-        } else {
-          message.info(text)
-        }
+    runLowCodeAction(
+      action,
+      {
+        state,
+        preview: options?.preview,
+        message: (text, type = 'info') => {
+          if (type === 'success') {
+            message.success(text)
+          } else if (type === 'error') {
+            message.error(text)
+          } else {
+            message.info(text)
+          }
+        },
       },
-    }, params)
+      params,
+    )
   }
 
   return { state, runAction }

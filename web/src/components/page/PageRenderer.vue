@@ -21,10 +21,17 @@ const isLowCode = computed(() => {
 <template>
   <LowCodeRenderer
     v-if="isLowCode && view.schemaJson"
+    :key="`${view.pageCode || 'page'}-${view.schemaJson}`"
     :schema-json="view.schemaJson"
     :layout="view.layout"
     :title="view.pageTitle"
+    :preview="preview"
   />
-  <SchemaRenderer v-else-if="view.crudSchema" :schema="view.crudSchema" :preview="preview" />
+  <SchemaRenderer
+    v-else-if="view.crudSchema"
+    :key="`${view.crudSchema.appCode}-${view.crudSchema.entityCode}-${view.crudSchema.fields.length}`"
+    :schema="view.crudSchema"
+    :preview="preview"
+  />
   <Empty v-else description="暂无可预览内容" />
 </template>

@@ -66,8 +66,10 @@ onMounted(() => {
     <section class="hero-panel">
       <div class="hero-copy">
         <p class="hero-kicker"><ThunderboltOutlined /> AI 原生管理后台</p>
-        <h2>把业务送上可扩展轨道</h2>
-        <p>建模、发布、运行与智能体开发，统一在一个控制台完成。</p>
+        <div class="hero-headline">
+          <h2>把业务送上可扩展轨道</h2>
+          <p>建模、发布、运行与智能体开发，统一在一个控制台完成。</p>
+        </div>
         <div class="hero-actions">
           <Button type="primary" @click="router.push('/studio')">
             <RocketOutlined />
@@ -202,11 +204,18 @@ onMounted(() => {
     var(--bg-surface);
 }
 
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
 .hero-kicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 10px;
+  margin: 0;
   padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -217,15 +226,21 @@ onMounted(() => {
   letter-spacing: 0.04em;
 }
 
-.hero-copy h2 {
-  margin: 0 0 10px;
+.hero-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-headline h2 {
+  margin: 0;
   font-family: var(--font-display);
   font-size: clamp(24px, 3vw, 32px);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.25;
 }
 
-.hero-copy > p {
+.hero-headline p {
   margin: 0;
   max-width: 520px;
   color: var(--text-2);
@@ -236,7 +251,6 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 20px;
 }
 
 .hero-stats {

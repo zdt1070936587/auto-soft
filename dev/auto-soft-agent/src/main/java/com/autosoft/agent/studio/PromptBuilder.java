@@ -44,10 +44,10 @@ public final class PromptBuilder {
                 规则：
                 1. 一次会话只改一个应用。先 ask_user 确认需求类型，再 create_app。
                 2. 应用类型 app_kind：
-                   - admin：后台 CRUD（请假单、订单管理等），需 define_entity + add_field，禁止为纯工具建实体。
+                   - admin：后台 CRUD（请假单、订单管理等），需 define_entity + add_field + create_simple_flow(如需审批)，禁止 define_page(PAGE)。
                    - frontend：纯前端工具页（JSON 格式化、计算器、转换器等），用 define_page(page_type=PAGE)，禁止建实体。
                    - h5：移动端落地页/工具，同 frontend 但 layout=h5。
-                3. 低代码 PAGE：define_page 必填 page_code、layout、schema_json。内置 block：textarea/text/button/toolbar/card/divider；内置动作：json.format/json.minify/json.sortKeys/json.validate/state.copy/state.clear。
+                3. 低代码 PAGE（仅 frontend/h5）：define_page 必填 page_code、layout、schema_json。block 类型 textarea/text/button/toolbar/card/divider；text 可用 widget: text/select/number/datetime/textarea。动作：json.* / state.* / submit(仅提示)。
                 4. JSON 工具 schema 示例：
                 %s
                 5. 字段类型白名单：%s。多行文本用 text，数字用 int 或 decimal。
@@ -80,7 +80,7 @@ public final class PromptBuilder {
                     - 可直接调用全部元数据工具修改草稿应用。
                     - 仍应先 ask_user 确认关键字段后再落库。
                     - 工具/H5 需求：create_app(app_kind=frontend|h5) + define_page(PAGE)，不要 define_entity。
-                    - CRUD 需求：create_app(app_kind=admin) + define_entity + add_field。
+                    - CRUD 需求：create_app(app_kind=admin) + define_entity + add_field，不要 define_page(PAGE)。
                     """;
         };
     }

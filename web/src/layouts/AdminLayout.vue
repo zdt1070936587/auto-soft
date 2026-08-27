@@ -172,9 +172,14 @@ async function submitPassword() {
         <RouterLink to="/dashboard" class="logo-link">
           <AppLogo size="md" theme="dark" :collapsed="collapsed" />
         </RouterLink>
-        <button class="collapse-btn" type="button" :title="collapsed ? '展开菜单' : '收起菜单'" @click="toggleSidebar">
-          <MenuUnfoldOutlined v-if="collapsed" />
-          <MenuFoldOutlined v-else />
+        <button
+          v-if="!collapsed"
+          class="collapse-btn"
+          type="button"
+          title="收起菜单"
+          @click="toggleSidebar"
+        >
+          <MenuFoldOutlined />
         </button>
       </div>
       <Menu
@@ -255,6 +260,7 @@ async function submitPassword() {
 
 <style scoped>
 .admin-root {
+  --admin-topbar-height: 56px;
   min-height: 100vh;
   background: var(--bg-base);
 }
@@ -267,8 +273,15 @@ async function submitPassword() {
   background: linear-gradient(180deg, #121826 0%, #0f1522 100%) !important;
 }
 
+.sider :deep(.ant-layout-sider-children) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .logo-bar {
-  height: 52px;
+  height: var(--admin-topbar-height);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -278,12 +291,9 @@ async function submitPassword() {
 }
 
 .logo-bar.collapsed {
-  flex-direction: column;
   justify-content: center;
-  gap: 4px;
-  padding: 8px 6px 6px;
-  height: auto;
-  min-height: 52px;
+  padding: 0 6px;
+  height: var(--admin-topbar-height);
 }
 
 .logo-link {
@@ -353,22 +363,26 @@ async function submitPassword() {
   position: sticky;
   top: 0;
   z-index: 10;
-  height: 56px;
-  line-height: 56px;
-  padding: 0 24px;
+  height: var(--admin-topbar-height);
+  box-sizing: border-box;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   border-bottom: 1px solid var(--border);
   background: rgba(18, 24, 38, 0.85) !important;
   backdrop-filter: blur(12px);
+  overflow: hidden;
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .breadcrumb :deep(.ant-breadcrumb-link),
@@ -391,7 +405,9 @@ async function submitPassword() {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
+  max-width: min(100%, 320px);
 }
 
 .user-chip {
@@ -402,6 +418,8 @@ async function submitPassword() {
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--bg-elevated);
+  min-width: 0;
+  max-width: 200px;
 }
 
 .user-avatar {
@@ -420,31 +438,43 @@ async function submitPassword() {
   display: flex;
   flex-direction: column;
   line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .user-name {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-role {
   font-size: 11px;
   color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .account-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  height: 32px;
+  padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text-2);
   font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition: border-color 150ms ease, color 150ms ease;
+  flex-shrink: 0;
 }
 
 .account-btn:hover {
@@ -454,7 +484,7 @@ async function submitPassword() {
 
 .content {
   padding: 24px;
-  min-height: calc(100vh - 56px);
+  min-height: calc(100vh - var(--admin-topbar-height));
   background: var(--bg-base);
 }
 </style>

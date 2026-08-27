@@ -7,6 +7,7 @@ import {
   stateClear,
   stateCopy,
 } from './json'
+import { submitAction } from './runtime'
 
 const registry: Record<string, LowCodeAction> = {
   'json.format': jsonFormat,
@@ -15,6 +16,7 @@ const registry: Record<string, LowCodeAction> = {
   'json.validate': jsonValidate,
   'state.copy': stateCopy,
   'state.clear': stateClear,
+  submit: submitAction,
 }
 
 export function runLowCodeAction(action: string, ctx: Parameters<LowCodeAction>[0], params: Record<string, unknown>) {

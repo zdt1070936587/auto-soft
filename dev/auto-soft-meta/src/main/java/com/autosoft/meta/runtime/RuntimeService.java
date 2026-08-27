@@ -85,6 +85,17 @@ public class RuntimeService {
 
     public PageViewVO resolveAppView(String appCode, boolean preview) {
         MetaAppDO app = catalogService.requireAppByCode(appCode);
+        AppKind kind = AppKind.from(app.getAppKind());
+        List<MetaEntityDO> entities = catalogService.listEntities(app.getId());
+        if (kind.needsDdl() && !entities.isEmpty()) {
+            PageViewVO vo = new PageViewVO();
+            vo.setAppCode(app.getCode());
+            vo.setAppName(app.getName());
+            vo.setAppKind(kind.code());
+            vo.setPublished(MetaAppDO.PUBLISHED.equals(app.getStatus()));
+            vo.setCrudSchema(schema(appCode, entities.get(0).getCode(), preview));
+            return vo;
+        }
         List<MetaPageDO> pages = catalogService.listAppPages(app.getId());
         MetaPageDO lowCode = pages.stream()
                 .filter(page -> MetaCatalogService.PAGE_TYPE_PAGE.equals(page.getPageType()))
@@ -93,7 +104,6 @@ public class RuntimeService {
         if (lowCode != null) {
             return pageView(appCode, lowCode.getPageCode(), preview);
         }
-        List<MetaEntityDO> entities = catalogService.listEntities(app.getId());
         if (entities.isEmpty()) {
             return null;
         }

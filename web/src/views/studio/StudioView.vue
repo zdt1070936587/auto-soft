@@ -258,10 +258,11 @@ async function pickAttachment() {
   fileInputRef.value?.click()
 }
 
-async function onFilesSelected(event: Event) {
-  const inputEl = event.target as HTMLInputElement
-  const files = inputEl.files
-  if (!files?.length) {
+async function uploadFiles(files: File[]) {
+  if (!files.length) {
+    return
+  }
+  if (sending.value || uploading.value) {
     return
   }
   const sessionId = await ensureSession()
@@ -270,12 +271,11 @@ async function onFilesSelected(event: Event) {
   }
   if (pendingAttachments.value.length + files.length > 5) {
     message.warning('单次最多 5 个附件')
-    inputEl.value = ''
     return
   }
   uploading.value = true
   try {
-    for (const file of Array.from(files)) {
+    for (const file of files) {
       const uploaded = await uploadAttachment(sessionId, file)
       pendingAttachments.value.push({
         id: uploaded.id,
@@ -287,8 +287,55 @@ async function onFilesSelected(event: Event) {
     message.error(error instanceof Error ? error.message : '附件上传失败')
   } finally {
     uploading.value = false
-    inputEl.value = ''
   }
+}
+
+async function onFilesSelected(event: Event) {
+  const inputEl = event.target as HTMLInputElement
+  const files = inputEl.files
+  if (!files?.length) {
+    return
+  }
+  await uploadFiles(Array.from(files))
+  inputEl.value = ''
+}
+
+function imageExtFromMime(mime: string) {
+  const raw = mime.split('/')[1]?.toLowerCase() || 'png'
+  if (raw === 'jpeg') {
+    return 'jpg'
+  }
+  if (['png', 'jpg', 'webp', 'gif'].includes(raw)) {
+    return raw
+  }
+  return 'png'
+}
+
+async function onPaste(event: ClipboardEvent) {
+  if (sending.value || uploading.value) {
+    return
+  }
+  const items = event.clipboardData?.items
+  if (!items?.length) {
+    return
+  }
+  const imageFiles: File[] = []
+  for (const item of items) {
+    if (item.kind !== 'file' || !item.type.startsWith('image/')) {
+      continue
+    }
+    const blob = item.getAsFile()
+    if (!blob) {
+      continue
+    }
+    const ext = imageExtFromMime(blob.type)
+    imageFiles.push(new File([blob], `paste-${Date.now()}-${imageFiles.length + 1}.${ext}`, { type: blob.type }))
+  }
+  if (!imageFiles.length) {
+    return
+  }
+  event.preventDefault()
+  await uploadFiles(imageFiles)
 }
 
 function removeAttachment(id: number) {
@@ -616,7 +663,8 @@ onMounted(async () => {
               v-model:value="input"
               :rows="3"
               :disabled="sending"
-              placeholder="输入需求，Enter 发送 Ctrl+Enter 换行"
+              placeholder="输入需求，Enter 发送 Ctrl+Enter 换行，可直接粘贴图片"
+              @paste="onPaste"
               @keydown.enter.exact.prevent="send()"
             />
           </div>
@@ -657,7 +705,12 @@ onMounted(async () => {
       </template>
       <Spin :spinning="previewRefreshing">
         <Empty v-if="!pageView" description="右侧将显示当前草稿。确认方案后可点发布。" />
-        <PageRenderer v-else :view="pageView" :preview="true" />
+        <PageRenderer
+          v-else
+          :key="`${pageView.appCode}-${pageView.pageType}-${pageView.pageCode || pageView.crudSchema?.entityCode || ''}`"
+          :view="pageView"
+          :preview="true"
+        />
       </Spin>
     </Card>
   </div>

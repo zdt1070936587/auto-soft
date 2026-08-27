@@ -10,6 +10,7 @@ const props = defineProps<{
   schemaJson: string
   layout?: string
   title?: string
+  preview?: boolean
 }>()
 
 const parsed = computed<LowCodeSchema | null>(() => {
@@ -22,7 +23,7 @@ const parsed = computed<LowCodeSchema | null>(() => {
 
 const effectiveLayout = computed(() => props.layout || parsed.value?.layout || 'admin')
 const pageTitle = computed(() => props.title || parsed.value?.title || '')
-const { state, runAction } = useLowCodeState(() => parsed.value)
+const { state, runAction } = useLowCodeState(() => parsed.value, { preview: props.preview })
 
 provide(LOWCODE_RUN_ACTION, runAction)
 

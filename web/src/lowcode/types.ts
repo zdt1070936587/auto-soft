@@ -1,3 +1,8 @@
+export interface LowCodeOption {
+  label: string
+  value: string
+}
+
 export interface LowCodeBlock {
   type: string
   id?: string
@@ -9,6 +14,9 @@ export interface LowCodeBlock {
   action?: string
   from?: string
   to?: string
+  widget?: 'text' | 'textarea' | 'number' | 'select' | 'datetime'
+  required?: boolean
+  options?: LowCodeOption[]
   items?: LowCodeToolbarItem[]
   title?: string
   blocks?: LowCodeBlock[]
@@ -31,6 +39,7 @@ export interface LowCodeSchema {
 
 export interface ActionContext {
   state: Record<string, string>
+  preview?: boolean
   message: (text: string, type?: 'success' | 'error' | 'info') => void
 }
 
