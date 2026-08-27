@@ -3,7 +3,8 @@
 AI 管理后台：用户通过自然语言与系统对话，即可生成自己需要的后台功能（动态 CRUD + 审批流）。
 
 打开前端进入太阳系登录页；默认账号见 [docs/dev-setup.md](docs/dev-setup.md)。整体计划见 [docs/分阶段开发计划.md](docs/分阶段开发计划.md)。
-
+![img.png](img.png)
+![img_1.png](img_1.png)
 ## 目录总览
 
 ```
