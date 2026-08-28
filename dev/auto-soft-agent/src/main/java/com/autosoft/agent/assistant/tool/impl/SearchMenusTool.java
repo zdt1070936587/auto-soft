@@ -36,9 +36,9 @@ public class SearchMenusTool implements AssistantTool {
     @Override
     public Map<String, Object> parametersSchema() {
         Map<String, Object> props = new LinkedHashMap<>();
-        props.put("keyword", prop("string", "搜索关键词，如「用户管理」"));
-        props.put("limit", prop("integer", "最多返回条数，默认 5"));
-        return objectSchema(props, List.of("keyword"));
+        props.put("keyword", AssistantTool.prop("string", "搜索关键词，如「用户管理」"));
+        props.put("limit", AssistantTool.prop("integer", "最多返回条数，默认 5"));
+        return AssistantTool.objectSchema(props, List.of("keyword"));
     }
 
     @Override

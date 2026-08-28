@@ -35,11 +35,11 @@ public class RememberFactTool implements AssistantTool {
     @Override
     public Map<String, Object> parametersSchema() {
         Map<String, Object> props = new LinkedHashMap<>();
-        props.put("category", prop("string", "PROFILE | PREFERENCE | PROJECT"));
-        props.put("fact_key", prop("string", "name/role/team/preference_*"));
-        props.put("fact_value", prop("string", "要记住的内容"));
-        props.put("confidence", prop("number", "置信度 0~1，默认 0.8"));
-        return objectSchema(props, List.of("category", "fact_key", "fact_value"));
+        props.put("category", AssistantTool.prop("string", "PROFILE | PREFERENCE | PROJECT"));
+        props.put("fact_key", AssistantTool.prop("string", "name/role/team/preference_*"));
+        props.put("fact_value", AssistantTool.prop("string", "要记住的内容"));
+        props.put("confidence", AssistantTool.prop("number", "置信度 0~1，默认 0.8"));
+        return AssistantTool.objectSchema(props, List.of("category", "fact_key", "fact_value"));
     }
 
     @Override

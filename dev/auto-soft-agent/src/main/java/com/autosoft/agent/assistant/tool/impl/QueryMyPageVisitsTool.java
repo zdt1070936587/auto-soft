@@ -37,12 +37,12 @@ public class QueryMyPageVisitsTool implements AssistantTool {
     @Override
     public Map<String, Object> parametersSchema() {
         Map<String, Object> props = new LinkedHashMap<>();
-        props.put("time_from", prop("string", "区间开始 ISO8601，如 2026-08-27T00:00:00+08:00"));
-        props.put("time_to", prop("string", "区间结束 ISO8601"));
-        props.put("path", prop("string", "页面路径，如 /system/users"));
-        props.put("title_keyword", prop("string", "页面标题关键词，如「用户管理」"));
-        props.put("limit", prop("integer", "最多返回条数，默认 20"));
-        return objectSchema(props, List.of("time_from", "time_to"));
+        props.put("time_from", AssistantTool.prop("string", "区间开始 ISO8601，如 2026-08-27T00:00:00+08:00"));
+        props.put("time_to", AssistantTool.prop("string", "区间结束 ISO8601"));
+        props.put("path", AssistantTool.prop("string", "页面路径，如 /system/users"));
+        props.put("title_keyword", AssistantTool.prop("string", "页面标题关键词，如「用户管理」"));
+        props.put("limit", AssistantTool.prop("integer", "最多返回条数，默认 20"));
+        return AssistantTool.objectSchema(props, List.of("time_from", "time_to"));
     }
 
     @Override

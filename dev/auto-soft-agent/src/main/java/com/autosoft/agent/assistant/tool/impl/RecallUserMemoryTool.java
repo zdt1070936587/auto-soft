@@ -31,9 +31,9 @@ public class RecallUserMemoryTool implements AssistantTool {
     @Override
     public Map<String, Object> parametersSchema() {
         Map<String, Object> props = new LinkedHashMap<>();
-        props.put("query", prop("string", "回忆关键词或问题"));
-        props.put("top_k", prop("integer", "最多返回条数，默认 5"));
-        return objectSchema(props, List.of("query"));
+        props.put("query", AssistantTool.prop("string", "回忆关键词或问题"));
+        props.put("top_k", AssistantTool.prop("integer", "最多返回条数，默认 5"));
+        return AssistantTool.objectSchema(props, List.of("query"));
     }
 
     @Override

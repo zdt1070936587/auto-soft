@@ -37,11 +37,11 @@ public class GetOperationTimelineTool implements AssistantTool {
     @Override
     public Map<String, Object> parametersSchema() {
         Map<String, Object> props = new LinkedHashMap<>();
-        props.put("time_from", prop("string", "关注区间开始 ISO8601"));
-        props.put("time_to", prop("string", "关注区间结束 ISO8601"));
-        props.put("padding_minutes", prop("integer", "前后扩展分钟数，默认 30"));
-        props.put("limit", prop("integer", "最多返回条数，默认 50"));
-        return objectSchema(props, List.of("time_from", "time_to"));
+        props.put("time_from", AssistantTool.prop("string", "关注区间开始 ISO8601"));
+        props.put("time_to", AssistantTool.prop("string", "关注区间结束 ISO8601"));
+        props.put("padding_minutes", AssistantTool.prop("integer", "前后扩展分钟数，默认 30"));
+        props.put("limit", AssistantTool.prop("integer", "最多返回条数，默认 50"));
+        return AssistantTool.objectSchema(props, List.of("time_from", "time_to"));
     }
 
     @Override
