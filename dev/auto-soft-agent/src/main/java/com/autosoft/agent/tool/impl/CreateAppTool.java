@@ -3,6 +3,9 @@ package com.autosoft.agent.tool.impl;
 import com.autosoft.agent.tool.AgentTool;
 import com.autosoft.agent.tool.ToolArgs;
 import com.autosoft.agent.tool.ToolContext;
+import com.autosoft.common.core.ResultCode;
+import com.autosoft.common.exception.BizException;
+import com.autosoft.meta.app.AppKind;
 import com.autosoft.meta.app.MetaCatalogService;
 import com.autosoft.meta.dto.MetaAppSaveDTO;
 import org.springframework.stereotype.Component;
@@ -46,6 +49,9 @@ public class CreateAppTool implements AgentTool {
         dto.setCode(args.requireStr("code"));
         dto.setName(args.requireStr("name"));
         dto.setAppKind(args.str("app_kind", "admin"));
+        if (AppKind.WORKFLOW.code().equals(AppKind.from(dto.getAppKind()).code())) {
+            throw new BizException(ResultCode.BAD_REQUEST, "工作流请使用 create_workflow");
+        }
         dto.setGrantRoles(args.str("grant_roles", "USER"));
         Long id = catalogService.createApp(dto);
         context.bindApp(id);

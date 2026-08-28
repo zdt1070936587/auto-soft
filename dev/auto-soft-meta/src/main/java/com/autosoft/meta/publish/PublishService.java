@@ -64,6 +64,9 @@ public class PublishService {
     public void publish(Long appId, PublishDTO dto) {
         MetaAppDO app = catalogService.requireApp(appId);
         AppKind kind = AppKind.from(app.getAppKind());
+        if (kind == AppKind.WORKFLOW) {
+            throw new BizException(ResultCode.BAD_REQUEST, "工作流请使用工作流发布接口");
+        }
         List<MetaEntityDO> entities = catalogService.listEntities(appId);
         List<MetaPageDO> pages = catalogService.listAppPages(appId);
 

@@ -32,7 +32,7 @@ docker compose up -d
 
 **5432 被占用**：修改 `docker-compose.yml` 为 `15432:5432`，并把 `dev/auto-soft-boot/src/main/resources/application-dev.yml` 的 URL 改成 `jdbc:postgresql://127.0.0.1:15432/autosoft`。
 
-首次启动 Flyway 会执行 `V1.0.0__init.sql` 与 `V1.1.0__sys_user_role.sql`。
+首次启动 Flyway 会执行 `V1.0.0` 起的迁移（含阶段 6A 的 `V1.8.0__workflow.sql` 与 6C 的 `V1.9.0__wf_schedule.sql`）。
 
 ## 3. 启动后端
 

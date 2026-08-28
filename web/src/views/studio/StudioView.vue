@@ -3,7 +3,9 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { PaperClipOutlined, CloseOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import { Button, Card, Empty, Input, Modal, Segmented, Select, Space, Spin, Tag, message } from 'ant-design-vue'
 import PageRenderer from '@/components/page/PageRenderer.vue'
+import WorkflowCanvas from '@/components/workflow/WorkflowCanvas.vue'
 import { publishMetaApp, type PageViewVO } from '@/api/meta'
+import { getWorkflowByApp, publishWorkflow, type WorkflowDefinitionVO } from '@/api/wf'
 import {
   chatStream,
   createSession,
@@ -28,6 +30,7 @@ const currentId = ref<number | null>(null)
 const current = computed(() => sessions.value.find((item) => item.id === currentId.value) || null)
 const messages = ref<AiMessageVO[]>([])
 const pageView = ref<PageViewVO | null>(null)
+const workflowDef = ref<WorkflowDefinitionVO | null>(null)
 const input = ref('')
 const sending = ref(false)
 const paused = ref(false)
@@ -433,7 +436,7 @@ async function send(overrideText?: string) {
           const tool = String(event.data.tool || '')
           thinkingSteps.value.push(`${tool} ${event.data.success ? '完成' : '失败'}`)
           void scrollToBottom()
-        } else if (event.event === 'schema_updated') {
+        } else if (event.event === 'schema_updated' || event.event === 'graph_updated') {
           void refreshSchema(sessionId)
         } else if (event.event === 'paused') {
           paused.value = true
@@ -483,6 +486,10 @@ function reviseAskUser() {
 
 async function refreshSchema(sessionId: number) {
   pageView.value = await getSessionSchema(sessionId)
+  workflowDef.value = null
+  if (pageView.value?.appKind === 'workflow' && current.value?.appId) {
+    workflowDef.value = await getWorkflowByApp(current.value.appId)
+  }
 }
 
 async function refreshPreview() {
@@ -507,9 +514,15 @@ function publish() {
   }
   Modal.confirm({
     title: '确认发布？',
-    content: '将创建动态表并生成菜单。USER 需重新登录或刷新菜单后可见。已加列不会删除。',
+    content: pageView?.appKind === 'workflow'
+      ? '将校验并发布工作流快照，生成运行菜单。USER 需刷新菜单后可见。'
+      : '将创建动态表并生成菜单。USER 需重新登录或刷新菜单后可见。已加列不会删除。',
     async onOk() {
-      await publishMetaApp(current.value!.appId as number)
+      if (pageView.value?.appKind === 'workflow' && workflowDef.value) {
+        await publishWorkflow(workflowDef.value.id, true)
+      } else {
+        await publishMetaApp(current.value!.appId as number)
+      }
       message.success('已发布')
       await refreshSchema(current.value!.id)
     },
@@ -569,7 +582,7 @@ onMounted(async () => {
           <div ref="msgsEl" class="msgs">
             <Empty
               v-if="!visibleMessages.length && !sending"
-              description="描述你要的功能，例如：做请假单，字段请假天数、原因，提交后要 ADMIN 审批"
+              description="描述你要的功能，例如：做请假单；或描述工作流步骤：根据合同 ID 查记录，用 LLM 起草提醒，发给 ADMIN"
             />
 
             <div
@@ -704,9 +717,15 @@ onMounted(async () => {
         </Button>
       </template>
       <Spin :spinning="previewRefreshing">
-        <Empty v-if="!pageView" description="右侧将显示当前草稿。确认方案后可点发布。" />
+        <Empty v-if="!pageView && !workflowDef" description="右侧将显示当前草稿。确认方案后可点发布。" />
+        <WorkflowCanvas
+          v-else-if="workflowDef"
+          :key="workflowDef.id"
+          :definition="workflowDef"
+          @refreshed="currentId != null && refreshSchema(currentId)"
+        />
         <PageRenderer
-          v-else
+          v-else-if="pageView"
           :key="`${pageView.appCode}-${pageView.pageType}-${pageView.pageCode || pageView.crudSchema?.entityCode || ''}`"
           :view="pageView"
           :preview="true"

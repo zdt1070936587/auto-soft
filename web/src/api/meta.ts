@@ -60,6 +60,8 @@ export interface PageViewVO {
   layout?: string
   schemaJson?: string
   published: boolean
+  graphJson?: string
+  workflowId?: number
   crudSchema?: RuntimeSchemaVO
 }
 

@@ -18,6 +18,7 @@
         <module>auto-soft-meta</module>
         <module>auto-soft-agent</module>
         <module>auto-soft-flow</module>
+        <module>auto-soft-workflow</module>
         <module>auto-soft-boot</module>
     </modules>
 
@@ -91,6 +92,11 @@
             <dependency>
                 <groupId>com.autosoft</groupId>
                 <artifactId>auto-soft-flow</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.autosoft</groupId>
+                <artifactId>auto-soft-workflow</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

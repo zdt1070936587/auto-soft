@@ -20,8 +20,10 @@ import com.autosoft.meta.entity.MetaAppDO;
 import com.autosoft.meta.entity.MetaEntityDO;
 import com.autosoft.meta.runtime.FlowBinder;
 import com.autosoft.meta.runtime.FlowHook;
+import com.autosoft.meta.runtime.FlowStartPort;
 import com.autosoft.meta.runtime.FlowSubmitHook;
 import com.autosoft.meta.runtime.RuntimeService;
+import com.autosoft.meta.runtime.WorkflowResumeHook;
 import com.autosoft.system.mapper.RoleMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.context.annotation.Lazy;
@@ -37,7 +39,7 @@ import java.util.Map;
  * 单线审批封装。驳回终止当前实例，再次提交 start 新实例。
  */
 @Service
-public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder {
+public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder, FlowStartPort {
 
     private final MetaEntityFlowMapper bindMapper;
     private final FlowDefinitionMapper definitionMapper;
@@ -46,10 +48,12 @@ public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder {
     private final RoleMapper roleMapper;
     private final MetaCatalogService catalogService;
     private final RuntimeService runtimeService;
+    private final WorkflowResumeHook workflowResumeHook;
 
     public FlowManager(MetaEntityFlowMapper bindMapper, FlowDefinitionMapper definitionMapper,
                        FlowInstanceMapper instanceMapper, FlowTaskMapper taskMapper, RoleMapper roleMapper,
-                       MetaCatalogService catalogService, @Lazy RuntimeService runtimeService) {
+                       MetaCatalogService catalogService, @Lazy RuntimeService runtimeService,
+                       WorkflowResumeHook workflowResumeHook) {
         this.bindMapper = bindMapper;
         this.definitionMapper = definitionMapper;
         this.instanceMapper = instanceMapper;
@@ -57,6 +61,7 @@ public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder {
         this.roleMapper = roleMapper;
         this.catalogService = catalogService;
         this.runtimeService = runtimeService;
+        this.workflowResumeHook = workflowResumeHook;
     }
 
     @Override
@@ -89,14 +94,14 @@ public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder {
         FlowDefinitionDO def = definitionMapper.selectById(bind.getDefinitionId());
         AssertUtils.notNull(def, "流程定义不存在");
         List<String> roles = splitRoles(def.getApproveRoleCodes());
-        LoginUser user = SecurityUtils.requireUser();
+        LoginUser user = SecurityUtils.currentUser();
         FlowInstanceDO ins = new FlowInstanceDO();
         ins.setDefinitionId(def.getId());
         ins.setAppCode(appCode);
         ins.setEntityCode(entityCode);
         ins.setBizId(bizId);
         ins.setStatus("processing");
-        ins.setStartUserId(user.getUserId());
+        ins.setStartUserId(user == null ? 0L : user.getUserId());
         ins.setCurrentLevel(0);
         instanceMapper.insert(ins);
         FlowTaskDO task = new FlowTaskDO();
@@ -134,6 +139,23 @@ public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder {
         }
         bindFlow(entityId, def.getId());
         return def.getId();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long startSimple(String app, String entity, Long bizId, List<String> roleCodes) {
+        MetaEntityDO metaEntity = catalogService.requireEntity(app, entity);
+        createSimpleFlow(metaEntity.getId(), roleCodes);
+        submit(app, entity, bizId);
+        FlowInstanceDO ins = instanceMapper.selectOne(new LambdaQueryWrapper<FlowInstanceDO>()
+                .eq(FlowInstanceDO::getAppCode, app)
+                .eq(FlowInstanceDO::getEntityCode, entity)
+                .eq(FlowInstanceDO::getBizId, bizId)
+                .eq(FlowInstanceDO::getStatus, "processing")
+                .orderByDesc(FlowInstanceDO::getId)
+                .last("LIMIT 1"));
+        AssertUtils.notNull(ins, "审批实例未创建");
+        return ins.getId();
     }
 
     @Override
@@ -196,6 +218,7 @@ public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder {
             ins.setStatus("rejected");
             instanceMapper.updateById(ins);
             runtimeService.updateStatus(ins.getAppCode(), ins.getEntityCode(), ins.getBizId(), "rejected");
+            workflowResumeHook.onApprovalFinished(ins.getAppCode(), ins.getEntityCode(), ins.getBizId(), false, comment);
             return;
         }
         int next = task.getLevelNo() + 1;
@@ -203,6 +226,7 @@ public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder {
             ins.setStatus("approved");
             instanceMapper.updateById(ins);
             runtimeService.updateStatus(ins.getAppCode(), ins.getEntityCode(), ins.getBizId(), "approved");
+            workflowResumeHook.onApprovalFinished(ins.getAppCode(), ins.getEntityCode(), ins.getBizId(), true, comment);
             return;
         }
         ins.setCurrentLevel(next);

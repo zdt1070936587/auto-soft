@@ -17,13 +17,17 @@ import com.autosoft.common.utils.AssertUtils;
 import com.autosoft.framework.log.OperLog;
 import com.autosoft.framework.security.LoginUser;
 import com.autosoft.framework.security.SecurityUtils;
+import com.autosoft.meta.app.AppKind;
 import com.autosoft.meta.app.MetaCatalogService;
 import com.autosoft.meta.entity.MetaAppDO;
 import com.autosoft.meta.runtime.RuntimeService;
 import com.autosoft.meta.vo.PageViewVO;
+import com.autosoft.workflow.def.WorkflowDefinitionService;
+import com.autosoft.workflow.vo.WorkflowDefinitionVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,17 +46,22 @@ public class StudioSessionService {
     private final MetaCatalogService catalogService;
     private final RuntimeService runtimeService;
     private final StudioAttachmentService attachmentService;
+    private final WorkflowDefinitionService workflowDefinitionService;
+    private final JsonMapper jsonMapper;
 
     public StudioSessionService(AiSessionMapper sessionMapper, AiMessageMapper messageMapper,
                                 AiToolLogMapper toolLogMapper,
                                 MetaCatalogService catalogService, RuntimeService runtimeService,
-                                StudioAttachmentService attachmentService) {
+                                StudioAttachmentService attachmentService,
+                                WorkflowDefinitionService workflowDefinitionService, JsonMapper jsonMapper) {
         this.sessionMapper = sessionMapper;
         this.messageMapper = messageMapper;
         this.toolLogMapper = toolLogMapper;
         this.catalogService = catalogService;
         this.runtimeService = runtimeService;
         this.attachmentService = attachmentService;
+        this.workflowDefinitionService = workflowDefinitionService;
+        this.jsonMapper = jsonMapper;
     }
 
     public List<AiSessionVO> listMine() {
@@ -106,6 +115,17 @@ public class StudioSessionService {
             return null;
         }
         MetaAppDO app = catalogService.requireApp(session.getAppId());
+        if (AppKind.WORKFLOW.code().equals(AppKind.from(app.getAppKind()).code())) {
+            WorkflowDefinitionVO wf = workflowDefinitionService.getByAppId(app.getId());
+            PageViewVO vo = new PageViewVO();
+            vo.setAppCode(app.getCode());
+            vo.setAppName(app.getName());
+            vo.setAppKind(AppKind.WORKFLOW.code());
+            vo.setPublished(MetaAppDO.PUBLISHED.equals(app.getStatus()));
+            vo.setWorkflowId(wf.getId());
+            vo.setGraphJson(jsonMapper.writeValueAsString(wf.getGraph()));
+            return vo;
+        }
         return runtimeService.resolveAppView(app.getCode(), true);
     }
 

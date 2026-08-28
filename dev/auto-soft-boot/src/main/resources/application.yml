@@ -37,6 +37,11 @@ autosoft:
     timeout-seconds: 120
   upload:
     dir: "./data/studio-uploads"
+  workflow:
+    http:
+      allowed-hosts: []
+    schedule:
+      min-interval-ms: 300000
 
 warm-flow:
   enabled: false

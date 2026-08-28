@@ -36,6 +36,7 @@ dev/
 ├── auto-soft-meta/         # 元数据建模、DDL、动态 CRUD 运行时、发布
 ├── auto-soft-agent/        # 功能开发工作室、LLM、Agent 工具
 ├── auto-soft-flow/         # warm-flow 封装、待办/已办、实体绑定流程
+├── auto-soft-workflow/     # 自动化工作流 DAG（阶段 6A）
 └── auto-soft-boot/         # 启动类、配置、Flyway 迁移、健康检查
 ```
 
@@ -49,6 +50,7 @@ dev/
 | `auto-soft-meta` | `com.autosoft.meta` | 应用/实体/字段、发布建表、`/api/runtime` |
 | `auto-soft-agent` | `com.autosoft.agent` | Studio 会话流、LLM 配置、工具调用 |
 | `auto-soft-flow` | `com.autosoft.flow` | 流程绑定、提交、待办已办 |
+| `auto-soft-workflow` | `com.autosoft.workflow` | 自动化工作流 DAG、试跑与发布运行 |
 | `auto-soft-boot` | `com.autosoft` / `com.autosoft.boot` | `AutoSoftApplication`、Flyway、`/api/health` |
 
 ### 代码结构（按包）
@@ -101,6 +103,13 @@ auto-soft-flow
     ├── FlowManager.java
     ├── web/                  # FlowTodoController
     └── entity/ mapper/ dto/ vo/
+
+auto-soft-workflow
+└── com.autosoft.workflow
+    ├── graph/                # IR、Validator
+    ├── exec/                 # Executor、节点
+    ├── def/                  # 草稿与发布
+    └── web/                  # WorkflowController
 
 auto-soft-boot
 ├── src/main/java/com/autosoft/AutoSoftApplication.java

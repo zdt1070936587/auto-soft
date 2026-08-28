@@ -17,5 +17,9 @@
             <groupId>com.autosoft</groupId>
             <artifactId>auto-soft-meta</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.autosoft</groupId>
+            <artifactId>auto-soft-workflow</artifactId>
+        </dependency>
     </dependencies>
 </project>

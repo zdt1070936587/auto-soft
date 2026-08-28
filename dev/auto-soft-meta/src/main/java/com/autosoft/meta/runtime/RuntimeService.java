@@ -4,6 +4,7 @@ import com.autosoft.common.core.PageQuery;
 import com.autosoft.common.core.PageResult;
 import com.autosoft.common.core.ResultCode;
 import com.autosoft.common.exception.BizException;
+import com.autosoft.common.utils.AssertUtils;
 import com.autosoft.framework.security.LoginUser;
 import com.autosoft.framework.security.SecurityUtils;
 import com.autosoft.meta.app.AppKind;
@@ -31,13 +32,15 @@ public class RuntimeService {
     private final RuntimeSqlManager sqlManager;
     private final FlowHook flowHook;
     private final FlowSubmitHook submitHook;
+    private final WorkflowFormTriggerHook formTriggerHook;
 
     public RuntimeService(MetaCatalogService catalogService, RuntimeSqlManager sqlManager, FlowHook flowHook,
-                          FlowSubmitHook submitHook) {
+                          FlowSubmitHook submitHook, WorkflowFormTriggerHook formTriggerHook) {
         this.catalogService = catalogService;
         this.sqlManager = sqlManager;
         this.flowHook = flowHook;
         this.submitHook = submitHook;
+        this.formTriggerHook = formTriggerHook;
     }
 
     public RuntimeSchemaVO schema(String appCode, String entityCode, boolean preview) {
@@ -152,11 +155,50 @@ public class RuntimeService {
     public void submit(String appCode, String entityCode, Long id) {
         load(appCode, entityCode, false, "submit");
         submitHook.submit(appCode, entityCode, id);
+        formTriggerHook.onRowSubmitted(appCode, entityCode, id, sqlManager.get(
+                Identifiers.tableName(appCode, entityCode), id));
     }
 
     public Map<String, Object> getRow(String appCode, String entityCode, Long id) {
         Loaded loaded = load(appCode, entityCode, false, "list");
         return sqlManager.get(loaded.table, id);
+    }
+
+    public Map<String, Object> getPublishedRow(String appCode, String entityCode, Long id) {
+        Identifiers.assertCode(appCode, "appCode");
+        Identifiers.assertCode(entityCode, "entityCode");
+        MetaAppDO app = catalogService.requireAppByCode(appCode);
+        AssertUtils.isTrue(MetaAppDO.PUBLISHED.equals(app.getStatus()), "只能查询已发布实体");
+        catalogService.requireEntity(appCode, entityCode);
+        return sqlManager.get(Identifiers.tableName(appCode, entityCode), id);
+    }
+
+    public Map<String, Object> upsertPublishedRow(String appCode, String entityCode, Long id, Map<String, Object> fields) {
+        Identifiers.assertCode(appCode, "appCode");
+        Identifiers.assertCode(entityCode, "entityCode");
+        MetaAppDO app = catalogService.requireAppByCode(appCode);
+        AssertUtils.isTrue(MetaAppDO.PUBLISHED.equals(app.getStatus()), "只能写入已发布实体");
+        MetaEntityDO entity = catalogService.requireEntity(appCode, entityCode);
+        List<MetaFieldDO> metaFields = catalogService.listFields(entity.getId());
+        Map<String, Object> body = new java.util.LinkedHashMap<>();
+        if (fields != null) {
+            for (Map.Entry<String, Object> entry : fields.entrySet()) {
+                String col = entry.getKey();
+                AssertUtils.isTrue(!Identifiers.SYSTEM_COLUMNS.contains(col), "禁止修改系统列: " + col);
+                boolean allowed = metaFields.stream().anyMatch(f -> col.equals(f.getCode()));
+                AssertUtils.isTrue(allowed, "字段不在白名单: " + col);
+                body.put(col, entry.getValue());
+            }
+        }
+        String table = Identifiers.tableName(appCode, entityCode);
+        Long rowId = id;
+        if (rowId == null) {
+            String status = flowHook.initialStatus(appCode, entityCode);
+            rowId = sqlManager.insert(table, metaFields, body, status);
+        } else {
+            sqlManager.update(table, metaFields, rowId, body);
+        }
+        return sqlManager.get(table, rowId);
     }
 
     public void updateStatus(String appCode, String entityCode, Long id, String status) {

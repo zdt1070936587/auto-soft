@@ -7,7 +7,8 @@ public enum AppKind {
 
     ADMIN("admin"),
     FRONTEND("frontend"),
-    H5("h5");
+    H5("h5"),
+    WORKFLOW("workflow");
 
     private final String code;
 

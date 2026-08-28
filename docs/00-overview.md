@@ -6,7 +6,7 @@ AI 管理后台：用户仅通过与系统对话，即可生成自己需要的�
 
 ## 已确认决策
 
-- **能力边界**：元数据驱动的动态 CRUD + warm-flow 审批流。对话后立刻得到可点可用的页面与流程。MVP **不生成、不写入 Java/Vue 源码文件**。
+- **能力边界**：元数据驱动的动态 CRUD + warm-flow 审批流。对话后立刻得到可点可用的页面与流程。MVP **不生成、不写入 Java/Vue 源码文件**。阶段 6 起增加 **DAG 自动化工作流**（自然语言生成可编辑图），与单线审批分离，见 [阶段6-自动化工作流.md](./阶段6-自动化工作流.md)。
 - **大模型**：OpenCode Go。管理员在系统设置中指定模型，代码仅保留兜底默认（建议 `kimi-k2.7-code`）。
 - **目录**：前端 `web/`，后端 `dev/`，设计文档 `docs/`。
 - **规范**：阿里巴巴 Java 开发手册；Controller 禁止业务代码；复杂业务主方法只写步骤。
@@ -47,7 +47,7 @@ flowchart LR
 | JDK | 25 |
 | 后端 | Spring Boot 4.1.x、Spring Security、JWT（阶段 1 起） |
 | ORM | MyBatis-Plus（阶段 1 起接入） |
-| 工作流 | warm-flow（阶段 4） |
+| 工作流 | warm-flow 单线审批（阶段 4）；DAG 自动化（阶段 6A/B/C，`auto-soft-workflow`） |
 | 数据库 | PostgreSQL 16+，Flyway |
 | 前端 | Vue 3、Vite、TypeScript、Ant Design Vue 4、Pinia |
 | 登录动效 | Three.js 太阳系（阶段 1） |
@@ -63,6 +63,7 @@ flowchart LR
 | `auto-soft-meta` | 元数据与动态 CRUD 运行时 |
 | `auto-soft-agent` | 对话与 OpenCode Go |
 | `auto-soft-flow` | warm-flow 封装 |
+| `auto-soft-workflow` | 自动化工作流 DAG（阶段 6A） |
 | `auto-soft-boot` | 启动模块 |
 
 依赖只能向下。`boot` 是唯一聚合启动点。

@@ -111,6 +111,24 @@ public class ToolArgs {
     }
 
     public Map<String, Object> map() {
-        return new LinkedHashMap<>(map);
+        return new LinkedHashMap<>(this.map);
+    }
+
+    public Map<String, Object> objectMap(String key) {
+        Object value = map.get(key);
+        if (value instanceof Map<?, ?> nested) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            nested.forEach((k, v) -> result.put(String.valueOf(k), v));
+            return result;
+        }
+        return new LinkedHashMap<>();
+    }
+
+    public Map<String, String> strMap(String key) {
+        Map<String, String> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : objectMap(key).entrySet()) {
+            result.put(entry.getKey(), entry.getValue() == null ? "" : String.valueOf(entry.getValue()));
+        }
+        return result;
     }
 }

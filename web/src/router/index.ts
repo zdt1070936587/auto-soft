@@ -10,6 +10,8 @@ import MetaAppView from '@/views/meta/MetaAppView.vue'
 import RuntimePageView from '@/views/runtime/RuntimePageView.vue'
 import LowCodePageView from '@/views/runtime/LowCodePageView.vue'
 import StudioView from '@/views/studio/StudioView.vue'
+import WorkflowRunView from '@/views/workflow/WorkflowRunView.vue'
+import WorkflowShareView from '@/views/workflow/WorkflowShareView.vue'
 import LlmSettingView from '@/views/system/LlmSettingView.vue'
 import TodoView from '@/views/flow/TodoView.vue'
 import DoneView from '@/views/flow/DoneView.vue'
@@ -90,6 +92,18 @@ const router = createRouter({
           name: 'studio',
           meta: { title: '功能开发' },
           component: StudioView,
+        },
+        {
+          path: 'wf/share/:token',
+          name: 'workflow-share',
+          meta: { title: '工作流分享' },
+          component: WorkflowShareView,
+        },
+        {
+          path: 'wf/:code',
+          name: 'workflow-run',
+          meta: { title: '运行工作流' },
+          component: WorkflowRunView,
         },
         {
           path: 'system/llm',

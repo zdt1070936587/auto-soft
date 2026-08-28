@@ -23,6 +23,10 @@ const appMenus = computed(() =>
   auth.menus.filter((menu) => menu.menuType !== 'BUTTON' && (menu.path || '').startsWith('/app/')),
 )
 
+const wfMenus = computed(() =>
+  auth.menus.filter((menu) => menu.menuType === 'MENU' && (menu.path || '').startsWith('/wf/')),
+)
+
 const entityCount = computed(() =>
   appMenus.value.reduce((sum, menu) => sum + (menu.children?.filter((c) => c.menuType === 'MENU').length || 0), 0),
 )
@@ -141,6 +145,30 @@ onMounted(() => {
               <ArrowRightOutlined />
             </Button>
           </div>
+        </article>
+      </div>
+    </section>
+
+    <section v-if="wfMenus.length" class="page-panel">
+      <div class="section-head">
+        <div>
+          <h3 class="page-panel__title">已发布工作流</h3>
+          <p class="section-desc">手工触发运行</p>
+        </div>
+      </div>
+      <div class="app-grid">
+        <article v-for="item in wfMenus" :key="item.id" class="app-card">
+          <div class="app-card__head">
+            <span class="app-icon"><AppstoreOutlined /></span>
+            <div>
+              <h4>{{ item.name }}</h4>
+              <p>{{ item.path }}</p>
+            </div>
+          </div>
+          <Button type="link" class="open-app" @click="openEntity(item.path)">
+            运行
+            <ArrowRightOutlined />
+          </Button>
         </article>
       </div>
     </section>

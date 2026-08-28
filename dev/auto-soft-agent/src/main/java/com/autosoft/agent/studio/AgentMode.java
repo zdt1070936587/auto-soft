@@ -15,7 +15,7 @@ public enum AgentMode {
     DEVELOP("develop");
 
     public static final Set<String> READ_ONLY_TOOLS = Set.of(
-            "ask_user", "get_current_schema", "preview_app");
+            "ask_user", "get_current_schema", "preview_app", "get_workflow_graph", "validate_workflow");
 
     private final String code;
 

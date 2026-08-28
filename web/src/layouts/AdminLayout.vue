@@ -48,7 +48,7 @@ function menuIcon(path?: string) {
   if (path.startsWith('/app/')) {
     return AppstoreOutlined
   }
-  if (path.startsWith('/page/')) {
+  if (path.startsWith('/wf')) {
     return AppstoreOutlined
   }
   if (path.startsWith('/system') || path.startsWith('/meta') || path.startsWith('/flow')) {

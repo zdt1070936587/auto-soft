@@ -12,6 +12,9 @@ import com.autosoft.agent.mapper.AiSessionMapper;
 import com.autosoft.agent.mapper.AiToolLogMapper;
 import com.autosoft.agent.tool.ToolContext;
 import com.autosoft.agent.tool.ToolRegistry;
+import com.autosoft.meta.app.AppKind;
+import com.autosoft.meta.app.MetaCatalogService;
+import com.autosoft.meta.entity.MetaAppDO;
 import com.autosoft.common.core.ResultCode;
 import com.autosoft.common.exception.BizException;
 import com.autosoft.common.utils.AssertUtils;
@@ -40,6 +43,7 @@ public class AgentService {
 
     private static final Logger log = LoggerFactory.getLogger(AgentService.class);
     public static final int MAX_TOOL_LOOPS = 8;
+    public static final int MAX_WORKFLOW_TOOL_LOOPS = 16;
 
     private final AiSessionMapper sessionMapper;
     private final AiMessageMapper messageMapper;
@@ -49,10 +53,12 @@ public class AgentService {
     private final JsonMapper jsonMapper;
     private final TurnPauseRegistry pauseRegistry;
     private final StudioAttachmentService attachmentService;
+    private final MetaCatalogService catalogService;
 
     public AgentService(AiSessionMapper sessionMapper, AiMessageMapper messageMapper, AiToolLogMapper toolLogMapper,
                         OpenCodeGoManager openCodeGoManager, ToolRegistry toolRegistry, JsonMapper jsonMapper,
-                        TurnPauseRegistry pauseRegistry, StudioAttachmentService attachmentService) {
+                        TurnPauseRegistry pauseRegistry, StudioAttachmentService attachmentService,
+                        MetaCatalogService catalogService) {
         this.sessionMapper = sessionMapper;
         this.messageMapper = messageMapper;
         this.toolLogMapper = toolLogMapper;
@@ -61,6 +67,7 @@ public class AgentService {
         this.jsonMapper = jsonMapper;
         this.pauseRegistry = pauseRegistry;
         this.attachmentService = attachmentService;
+        this.catalogService = catalogService;
     }
 
     public SseEmitter startTurn(Long sessionId, ChatMessageDTO dto) {
@@ -134,8 +141,10 @@ public class AgentService {
 
     private TurnOutcome loopModel(AiSessionDO session, AgentMode mode, List<Map<String, Object>> messages,
                                   SseEmitter emitter) {
-        List<Map<String, Object>> tools = toolRegistry.openaiTools(mode);
-        for (int i = 0; i < MAX_TOOL_LOOPS; i++) {
+        String appKind = resolveAppKind(session);
+        List<Map<String, Object>> tools = toolRegistry.openaiTools(mode, appKind);
+        int maxLoops = AppKind.WORKFLOW.code().equals(appKind) ? MAX_WORKFLOW_TOOL_LOOPS : MAX_TOOL_LOOPS;
+        for (int i = 0; i < maxLoops; i++) {
             if (pauseRegistry.consumePause(session.getId())) {
                 finishPaused(session, emitter);
                 return TurnOutcome.PAUSED;
@@ -159,6 +168,9 @@ public class AgentService {
             }
             if (context.isSchemaUpdated()) {
                 emit(emitter, "schema_updated", Map.of("appId", nvl(session.getAppId())));
+                if (AppKind.WORKFLOW.code().equals(resolveAppKind(session))) {
+                    emit(emitter, "graph_updated", Map.of("appId", nvl(session.getAppId())));
+                }
             }
             if (askedUser) {
                 return TurnOutcome.COMPLETE;
@@ -241,6 +253,14 @@ public class AgentService {
             // 解析失败时把整段参数当作确认文案
         }
         return argumentsJson;
+    }
+
+    private String resolveAppKind(AiSessionDO session) {
+        if (session.getAppId() == null) {
+            return null;
+        }
+        MetaAppDO app = catalogService.requireApp(session.getAppId());
+        return AppKind.from(app.getAppKind()).code();
     }
 
     private AiSessionDO loadSession(Long sessionId) {

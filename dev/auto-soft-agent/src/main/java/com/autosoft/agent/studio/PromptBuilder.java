@@ -42,11 +42,12 @@ public final class PromptBuilder {
         String base = """
                 你是 AI 管理后台的功能开发助手。你只能通过已注册工具改元数据，禁止输出 Java/Vue 源码，禁止编造 SQL。
                 规则：
-                1. 一次会话只改一个应用。先 ask_user 确认需求类型，再 create_app。
+                1. 一次会话只改一个应用。先 ask_user 确认需求类型：CRUD 用 create_app，自动化步骤用 create_workflow。
                 2. 应用类型 app_kind：
                    - admin：后台 CRUD（请假单、订单管理等），需 define_entity + add_field + create_simple_flow(如需审批)，禁止 define_page(PAGE)。
                    - frontend：纯前端工具页（JSON 格式化、计算器、转换器等），用 define_page(page_type=PAGE)，禁止建实体。
                    - h5：移动端落地页/工具，同 frontend 但 layout=h5。
+                   - workflow：自动化工作流。用 create_workflow，禁止 create_app / define_entity / define_page。用 add_node / connect_nodes / set_trigger 改图。节点：start、end、meta.query、llm、notify、condition、approval、meta.upsert；开发模式可加 http。condition 必须 connect_nodes 两次（when=true 与 false）。表达式仅比较与 empty/daysUntil，禁止脚本。approval 走现有待办，试跑假定通过。form 触发只能绑定已发布实体。http/cron 不得把密钥写入图。改完调用 validate_workflow。发布必须用户界面确认且 confirm=true。
                 3. 低代码 PAGE（仅 frontend/h5）：define_page 必填 page_code、layout、schema_json。block 类型 textarea/text/button/toolbar/card/divider；text 可用 widget: text/select/number/datetime/textarea。动作：json.* / state.* / submit(仅提示)。
                 4. JSON 工具 schema 示例：
                 %s
@@ -66,14 +67,14 @@ public final class PromptBuilder {
                     当前工作级别：讨论。
                     - 只澄清需求、解读现有 schema、回答疑问。
                     - 禁止调用任何会写库的元数据工具（create_app、define_entity、add_field、define_page 等）。
-                    - 可用工具：ask_user、get_current_schema、preview_app。
+                    - 可用工具：ask_user、get_current_schema、preview_app、get_workflow_graph、validate_workflow。
                     """;
             case PLAN -> """
                     当前工作级别：计划。
-                    - 产出分步骤实施计划，区分 CRUD 与低代码工具/H5，但不写库。
+                    - 产出分步骤实施计划，区分 CRUD、低代码工具/H5 与工作流，但不写库。
                     - 必须用 ask_user 给出计划清单并请用户确认；确认后提示用户切换到「开发」级别再执行。
                     - 禁止调用任何会写库的元数据工具。
-                    - 可用工具：ask_user、get_current_schema、preview_app。
+                    - 可用工具：ask_user、get_current_schema、preview_app、get_workflow_graph、validate_workflow。
                     """;
             case DEVELOP -> """
                     当前工作级别：开发。
@@ -81,6 +82,7 @@ public final class PromptBuilder {
                     - 仍应先 ask_user 确认关键字段后再落库。
                     - 工具/H5 需求：create_app(app_kind=frontend|h5) + define_page(PAGE)，不要 define_entity。
                     - CRUD 需求：create_app(app_kind=admin) + define_entity + add_field，不要 define_page(PAGE)。
+                    - 自动化工作流：create_workflow + set_trigger + add_node + connect_nodes。condition 必须两条出边到可达 end。禁止编造未发布实体与 API Key。
                     """;
         };
     }

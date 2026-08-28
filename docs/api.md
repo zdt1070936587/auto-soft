@@ -116,3 +116,30 @@ SSE 事件：`text` / `tool_start` / `tool_end` / `schema_updated` / `error` / `
 | GET | `/api/system/logs` | `system:log:list` |
 
 查询：`current/size/module/username`。详情已脱敏，不含密码与 Key。
+
+---
+
+## 8. 自动化工作流（阶段 6A/B/C）
+
+权限：建模接口 `studio:use`；运行已发布流需 `wf:{code}:run`（开发者可试跑草稿）。分享接口需登录。
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| POST | `/api/wf` | 建草稿（同时建 `app_kind=workflow` 应用） |
+| GET | `/api/wf/{id}` | 定义 + graph |
+| GET | `/api/wf?appId=` | 按应用取定义 |
+| PUT | `/api/wf/{id}/graph` | 保存 IR（画布） |
+| POST | `/api/wf/{id}/validate` | 只校验 |
+| POST | `/api/wf/{id}/dry-run` | 草稿试跑，`{ input }`；approval 不真人审 |
+| POST | `/api/wf/{id}/publish` | `{ confirm: true }` |
+| POST | `/api/wf/{id}/share` | `{ permission: preview\|copy, expireDays }`，操作日志 SHARE |
+| GET | `/api/wf/share/{token}` | 只读图，剥离 secret/header/apiKey |
+| POST | `/api/wf/share/{token}/copy` | 复制为当前用户草稿 |
+| PUT | `/api/wf/{id}/schedule` | 超管关停/启用定时 `{ enabled }` |
+| GET | `/api/wf/by-code/{code}` | 已发布定义 |
+| POST | `/api/wf/{code}/run` | 按发布快照运行 |
+| GET | `/api/wf/runs/{runId}` | 实例与步骤 |
+
+节点：`start` / `end` / `meta.query` / `llm` / `notify` / `condition` / `approval` / `meta.upsert` / `http`。`condition` 必须 `when=true` 与 `when=false` 各一条出边。非 condition 可额外 `when=error`。`http` 的 host 须在 `autosoft.workflow.http.allowed-hosts`，并拒绝 localhost/私网/元数据 IP。
+
+SSE 增加 `graph_updated`。工作流会话禁止 `define_entity` 等 CRUD 工具。

@@ -12,6 +12,8 @@ public class PageViewVO {
     private String schemaJson;
     private boolean published;
     private RuntimeSchemaVO crudSchema;
+    private String graphJson;
+    private Long workflowId;
 
     public String getAppCode() {
         return appCode;
@@ -91,6 +93,22 @@ public class PageViewVO {
 
     public void setCrudSchema(RuntimeSchemaVO crudSchema) {
         this.crudSchema = crudSchema;
+    }
+
+    public String getGraphJson() {
+        return graphJson;
+    }
+
+    public void setGraphJson(String graphJson) {
+        this.graphJson = graphJson;
+    }
+
+    public Long getWorkflowId() {
+        return workflowId;
+    }
+
+    public void setWorkflowId(Long workflowId) {
+        this.workflowId = workflowId;
     }
 
     public boolean isLowCodePage() {

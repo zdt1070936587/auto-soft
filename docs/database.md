@@ -192,6 +192,36 @@ docker compose up -d
 
 无逻辑删除。`user_id`、`username`、`module`、`action`、`biz_id`、`success`、`ip`、`cost_ms`、`detail_json`（脱敏）、`created_at`。
 
+## 阶段 6A 已建表（`V1.8.0__workflow.sql`）
+
+前缀 `wf_`。公共字段同阶段 1。`wf_share` 已建表，B 暴露分享 API。
+
+### wf_definition
+
+`app_id`（与 `meta_app` 一对一）、`code`、`name`、`status`（DRAFT/PUBLISHED）、`graph_json`、`version`、`grant_roles`、`visibility` + 公共字段。
+
+### wf_definition_version
+
+发布快照：`definition_id`、`version`、`graph_json`。
+
+### wf_run / wf_run_step
+
+运行实例与逐步日志。`dry_run`、`status`（running/succeeded/failed/paused）、`trigger_json`、步骤摘要脱敏。paused 时 `trigger_json` 含上下文快照。
+
+### wf_notice
+
+站内通知：`run_id`、`to_role`、`title`、`body`。
+
+### wf_share
+
+分享令牌：`definition_id`、`token`、`permission`（preview/copy）、`expire_at`。
+
+## 阶段 6C 已建表（`V1.9.0__wf_schedule.sql`）
+
+### wf_schedule
+
+`definition_id`、`cron`、`enabled`、`last_run_at`。同一 definition 同时只允许一个 running/paused 运行；最小间隔由 `autosoft.workflow.schedule.min-interval-ms` 控制（默认 5 分钟）。
+
 本地空库可重建（会丢数据）：
 
 ```bash
