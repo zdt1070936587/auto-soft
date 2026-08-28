@@ -13,6 +13,7 @@ import StudioView from '@/views/studio/StudioView.vue'
 import WorkflowRunView from '@/views/workflow/WorkflowRunView.vue'
 import WorkflowShareView from '@/views/workflow/WorkflowShareView.vue'
 import LlmSettingView from '@/views/system/LlmSettingView.vue'
+import WorkflowHttpHostView from '@/views/system/WorkflowHttpHostView.vue'
 import TodoView from '@/views/flow/TodoView.vue'
 import DoneView from '@/views/flow/DoneView.vue'
 import OperLogView from '@/views/system/OperLogView.vue'
@@ -110,6 +111,12 @@ const router = createRouter({
           name: 'llm',
           meta: { title: '模型配置' },
           component: LlmSettingView,
+        },
+        {
+          path: 'system/workflow-http-hosts',
+          name: 'workflow-http-hosts',
+          meta: { title: 'HTTP 出站白名单' },
+          component: WorkflowHttpHostView,
         },
         {
           path: 'flow/todo',

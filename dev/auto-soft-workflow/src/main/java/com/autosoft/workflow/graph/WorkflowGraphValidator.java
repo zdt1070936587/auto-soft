@@ -8,7 +8,7 @@ import com.autosoft.meta.ddl.Identifiers;
 import com.autosoft.meta.entity.MetaAppDO;
 import com.autosoft.system.entity.RoleDO;
 import com.autosoft.system.mapper.RoleMapper;
-import com.autosoft.workflow.config.WorkflowProperties;
+import com.autosoft.workflow.http.WorkflowHttpHostService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Component;
@@ -33,13 +33,13 @@ public class WorkflowGraphValidator {
 
     private final MetaCatalogService catalogService;
     private final RoleMapper roleMapper;
-    private final WorkflowProperties properties;
+    private final WorkflowHttpHostService httpHostService;
 
     public WorkflowGraphValidator(MetaCatalogService catalogService, RoleMapper roleMapper,
-                                  WorkflowProperties properties) {
+                                  WorkflowHttpHostService httpHostService) {
         this.catalogService = catalogService;
         this.roleMapper = roleMapper;
-        this.properties = properties;
+        this.httpHostService = httpHostService;
     }
 
     public void validate(WorkflowGraph graph) {
@@ -187,7 +187,7 @@ public class WorkflowGraphValidator {
             if (method != null && !method.isBlank()) {
                 AssertUtils.isTrue("GET".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method), "http 仅允许 GET/POST");
             }
-            HttpHostGuard.assertAllowed(url, properties.getHttp().getAllowedHosts());
+            HttpHostGuard.assertAllowed(url, httpHostService.listAllowedHosts());
         }
     }
 

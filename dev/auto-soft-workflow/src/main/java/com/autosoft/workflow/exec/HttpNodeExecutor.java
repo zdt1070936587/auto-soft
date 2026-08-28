@@ -1,10 +1,10 @@
 package com.autosoft.workflow.exec;
 
 import com.autosoft.common.utils.AssertUtils;
-import com.autosoft.workflow.config.WorkflowProperties;
 import com.autosoft.workflow.graph.HttpHostGuard;
 import com.autosoft.workflow.graph.NodeTypes;
 import com.autosoft.workflow.graph.WfNode;
+import com.autosoft.workflow.http.WorkflowHttpHostService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -18,11 +18,12 @@ import java.util.Map;
 public class HttpNodeExecutor implements NodeExecutor {
 
     private final RestClient restClient;
-    private final WorkflowProperties properties;
+    private final WorkflowHttpHostService httpHostService;
 
-    public HttpNodeExecutor(@Qualifier("workflowRestClient") RestClient workflowRestClient, WorkflowProperties properties) {
+    public HttpNodeExecutor(@Qualifier("workflowRestClient") RestClient workflowRestClient,
+                            WorkflowHttpHostService httpHostService) {
         this.restClient = workflowRestClient;
-        this.properties = properties;
+        this.httpHostService = httpHostService;
     }
 
     @Override
@@ -34,7 +35,7 @@ public class HttpNodeExecutor implements NodeExecutor {
     public Object execute(WfNode node, Map<String, Object> renderedConfig, RunContext context) {
         String url = str(renderedConfig.get("url"));
         AssertUtils.notBlank(url, "http 缺少 url");
-        HttpHostGuard.assertAllowed(url, properties.getHttp().getAllowedHosts());
+        HttpHostGuard.assertAllowed(url, httpHostService.listAllowedHosts());
         String method = str(renderedConfig.get("method"));
         if (method == null || method.isBlank()) {
             method = "GET";

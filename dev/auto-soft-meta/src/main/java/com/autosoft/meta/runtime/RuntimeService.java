@@ -17,6 +17,7 @@ import com.autosoft.meta.entity.MetaPageDO;
 import com.autosoft.meta.page.LowCodeSchemaValidator;
 import com.autosoft.meta.vo.PageViewVO;
 import com.autosoft.meta.vo.RuntimeSchemaVO;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class RuntimeService {
     private final WorkflowFormTriggerHook formTriggerHook;
 
     public RuntimeService(MetaCatalogService catalogService, RuntimeSqlManager sqlManager, FlowHook flowHook,
-                          FlowSubmitHook submitHook, WorkflowFormTriggerHook formTriggerHook) {
+                          FlowSubmitHook submitHook, @Lazy WorkflowFormTriggerHook formTriggerHook) {
         this.catalogService = catalogService;
         this.sqlManager = sqlManager;
         this.flowHook = flowHook;

@@ -50,10 +50,14 @@ public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder, FlowSt
     private final RuntimeService runtimeService;
     private final WorkflowResumeHook workflowResumeHook;
 
-    public FlowManager(MetaEntityFlowMapper bindMapper, FlowDefinitionMapper definitionMapper,
-                       FlowInstanceMapper instanceMapper, FlowTaskMapper taskMapper, RoleMapper roleMapper,
-                       MetaCatalogService catalogService, @Lazy RuntimeService runtimeService,
-                       WorkflowResumeHook workflowResumeHook) {
+    public FlowManager(MetaEntityFlowMapper bindMapper,
+                       FlowDefinitionMapper definitionMapper,
+                       FlowInstanceMapper instanceMapper,
+                       FlowTaskMapper taskMapper,
+                       RoleMapper roleMapper,
+                       MetaCatalogService catalogService,
+                       @Lazy RuntimeService runtimeService,
+                       @Lazy WorkflowResumeHook workflowResumeHook) {
         this.bindMapper = bindMapper;
         this.definitionMapper = definitionMapper;
         this.instanceMapper = instanceMapper;

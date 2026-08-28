@@ -4,10 +4,10 @@ services:
     container_name: autosoft-postgres
     environment:
       POSTGRES_DB: autosoft
-      POSTGRES_USER: autosoft
-      POSTGRES_PASSWORD: autosoft
+      POSTGRES_USER: dafu
+      POSTGRES_PASSWORD: 123456
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - autosoft-pg-data:/var/lib/postgresql/data
 volumes:
