@@ -222,6 +222,42 @@ docker compose up -d
 
 `definition_id`、`cron`、`enabled`、`last_run_at`。同一 definition 同时只允许一个 running/paused 运行；最小间隔由 `autosoft.workflow.schedule.min-interval-ms` 控制（默认 5 分钟）。
 
+## 阶段 7 P0 已建表（`V2.0.0__assistant.sql`）
+
+全局 AI 助手会话，与 `ai_session`（Studio）分离。
+
+### ai_assistant_session
+
+`user_id`、`title`、`status`、`token_input`、`token_output` + 公共字段。无 `app_id`、无 `agent_mode`。
+
+### ai_assistant_message
+
+`session_id`、`role`、`content`、`payload_json`（导航卡片/操作时间线 JSON 快照）、`tool_name`、`tool_call_id`、`tokens` + 公共字段。
+
+### ai_assistant_tool_log
+
+结构同 `ai_tool_log`，审计 Assistant 工具调用。
+
+权限种子：`sys_menu.permission = assistant:use`（隐藏 BUTTON），四个内置角色均关联。
+
+## 阶段 7 P2 已建表（`V2.1.0__assistant_memory.sql`）
+
+需 PostgreSQL **pgvector** 扩展（`CREATE EXTENSION vector`）。
+
+### ai_memory_episode
+
+跨会话情景记忆：`user_id`、`session_id`、`episode_type`（`CHAT` / `OPER_CLUSTER`）、`content_full`、`content_summary`、`importance`、`embedding vector(1536)`、`occurred_at`、`decay_stage`（0 全文 / 1 仅摘要 / 2 归档）。HNSW 索引 `idx_ai_mem_ep_embedding`。
+
+### ai_memory_fact
+
+用户画像与偏好：`category`（`PROFILE` / `PREFERENCE` / `PROJECT`）、`fact_key`、`fact_value`、`confidence`、`confirmed`、`source_episode_id`、`embedding vector(1536)`。唯一约束 `(user_id, category, fact_key)`。HNSW 索引 `idx_ai_mem_fact_embedding`。
+
+## 阶段 7 P4 已建表（`V2.2.0__page_visit.sql`）
+
+### sys_page_visit
+
+页面浏览埋点（append-only）：`user_id`、`path`（不含 query）、`route_name`、`page_title`、`visited_at`。索引 `idx_sys_page_visit_user_time`、`idx_sys_page_visit_user_path`。90 天 retention 由定时任务清理。
+
 本地空库可重建（会丢数据）：
 
 ```bash

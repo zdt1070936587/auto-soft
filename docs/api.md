@@ -92,6 +92,31 @@
 
 SSE 事件：`text` / `tool_start` / `tool_end` / `schema_updated` / `error` / `done`。无 Key / 429 / 模型错误返回中文 `error.message`。
 
+### 全局 AI 助手（阶段 7 P0～P3）
+
+| 方法 | 路径 | 权限 | 说明 |
+| --- | --- | --- | --- |
+| GET/POST | `/api/assistant/sessions` | `assistant:use` | 列表 / 新建 |
+| GET | `/api/assistant/sessions/{id}/messages` | 同上 | 历史 |
+| DELETE | `/api/assistant/sessions/{id}` | 同上 | 删除会话 |
+| POST | `/api/assistant/sessions/{id}/chat` | 同上 | `text/event-stream`，body `{ message }` |
+| GET | `/api/assistant/memory/facts` | 同上 | 当前用户 fact 列表 |
+| DELETE | `/api/assistant/memory/facts/{id}` | 同上 | 逻辑删除 fact |
+| POST | `/api/assistant/memory/facts/{id}/confirm` | 同上 | 确认 fact |
+| GET | `/api/assistant/memory/episodes` | 同上 | 最近 episode 摘要（`?limit=20`） |
+
+SSE 事件：`text` / `tool_start` / `tool_end` / `structured`（`nav_link` / `oper_timeline`）/ `error` / `done`。与 Studio 会话隔离。
+
+助手工具（内部）：`search_menus`、`query_my_operations`、`get_operation_timeline`、`query_my_page_visits`、`recall_user_memory`、`remember_fact`。操作历史与页面浏览均强制 `user_id = 当前用户`。
+
+### 页面访问埋点（阶段 7 P4）
+
+| 方法 | 路径 | 权限 | 说明 |
+| --- | --- | --- | --- |
+| POST | `/api/telemetry/page-visits` | 登录即可 | body `{ visits: [{ path, routeName?, pageTitle?, visitedAt? }] }`，返回 `{ inserted }` |
+
+前端 AdminLayout 路由 `afterEach` 批量上报；同 path 60s 内去重。关闭：`autosoft.telemetry.page-visit.enabled=false` 与 `VITE_PAGE_VISIT_ENABLED=false`。
+
 ---
 
 ## 6. 审批

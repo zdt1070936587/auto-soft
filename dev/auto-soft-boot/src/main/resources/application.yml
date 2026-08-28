@@ -42,6 +42,28 @@ autosoft:
       allowed-hosts: []
     schedule:
       min-interval-ms: 300000
+  assistant:
+    memory:
+      enabled: true
+      embedding-model: text-embedding-3-small
+      embedding-dimensions: 1536
+      inject-max-chars: 4500
+      episode-importance-default: 5
+      recall-top-k: 3
+      consolidation:
+        enabled: true
+        cron: "0 0 2 * * ?"
+        decay-full-days: 7
+        decay-summary-days: 90
+        oper-cluster-padding-minutes: 30
+        batch-size: 50
+  telemetry:
+    page-visit:
+      enabled: true
+      retention-days: 90
+      retention-cron: "0 30 3 * * ?"
+      max-batch-size: 50
+      dedupe-window-seconds: 60
 
 warm-flow:
   enabled: false

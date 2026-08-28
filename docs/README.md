@@ -13,6 +13,7 @@
 | [阶段4-warm-flow审批.md](./阶段4-warm-flow审批.md) | 阶段 4 完整开发计划 |
 | [阶段5-收口与MVP冻结.md](./阶段5-收口与MVP冻结.md) | 阶段 5 完整开发计划 |
 | [阶段6-自动化工作流.md](./阶段6-自动化工作流.md) | 阶段 6 完整开发计划 |
+| [阶段7-全局AI助手与记忆系统.md](./阶段7-全局AI助手与记忆系统.md) | 阶段 7 完整开发计划 |
 | [coding-standards.md](./coding-standards.md) | 编码规范（Code Review 清单） |
 | [database.md](./database.md) | 数据库约定与表规划 |
 | [dev-setup.md](./dev-setup.md) | 本地启动与排障 |

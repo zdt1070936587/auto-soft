@@ -8,6 +8,7 @@ import com.autosoft.system.mapper.MenuMapper;
 import com.autosoft.system.mapper.RoleMapper;
 import com.autosoft.system.mapper.RoleMenuMapper;
 import com.autosoft.system.mapper.UserRoleMapper;
+import com.autosoft.system.vo.MenuSearchHit;
 import com.autosoft.system.vo.MenuVO;
 import com.autosoft.system.vo.RoleVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -76,6 +77,58 @@ public class MenuService {
                 .orderByAsc(MenuDO::getSort)
                 .orderByAsc(MenuDO::getId));
         return buildTree(menus);
+    }
+
+    /**
+     * 按名称/路径搜索当前用户可见菜单（Assistant 导航）。
+     */
+    public List<MenuSearchHit> searchMine(Long userId, String keyword, int limit) {
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+        int capped = limit <= 0 ? 5 : Math.min(limit, 10);
+        String kw = keyword.trim().toLowerCase();
+        List<MenuVO> tree = listMineTree(userId);
+        List<ScoredHit> scored = new ArrayList<>();
+        flattenForSearch(tree, null, scored, kw);
+        scored.sort(Comparator.comparingInt(ScoredHit::score).reversed()
+                .thenComparing(item -> item.hit.getSort() == null ? Integer.MAX_VALUE : item.hit.getSort()));
+        return scored.stream().limit(capped).map(item -> item.hit).toList();
+    }
+
+    private void flattenForSearch(List<MenuVO> nodes, String parentName, List<ScoredHit> out, String kw) {
+        for (MenuVO node : nodes) {
+            if ("MENU".equals(node.getMenuType()) && node.getPath() != null && !node.getPath().isBlank()) {
+                int score = scoreMenu(node, kw);
+                if (score > 0) {
+                    MenuSearchHit hit = new MenuSearchHit();
+                    hit.setName(node.getName());
+                    hit.setPath(node.getPath());
+                    hit.setPermission(node.getPermission());
+                    hit.setParentName(parentName);
+                    hit.setSort(node.getSort());
+                    out.add(new ScoredHit(score, hit));
+                }
+            }
+            if (node.getChildren() != null && !node.getChildren().isEmpty()) {
+                flattenForSearch(node.getChildren(), node.getName(), out, kw);
+            }
+        }
+    }
+
+    private int scoreMenu(MenuVO node, String kw) {
+        String name = node.getName() == null ? "" : node.getName().toLowerCase();
+        String path = node.getPath() == null ? "" : node.getPath().toLowerCase();
+        if (name.contains(kw)) {
+            return name.equals(kw) ? 100 : 80;
+        }
+        if (path.contains(kw.replace(" ", ""))) {
+            return 40;
+        }
+        return 0;
+    }
+
+    private record ScoredHit(int score, MenuSearchHit hit) {
     }
 
     public List<Long> listMenuIdsByRole(Long roleId) {

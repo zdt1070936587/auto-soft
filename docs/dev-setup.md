@@ -9,7 +9,7 @@
 | JDK | 25 |
 | Maven | 3.9+ |
 | Node.js | 20 LTS+（建议 22） |
-| Docker Desktop | 能跑 `postgres:16` 即可 |
+| Docker Desktop | 能跑 `pgvector/pgvector:pg16` 即可 |
 
 验证：
 
@@ -28,11 +28,18 @@ docker -v
 docker compose up -d
 ```
 
-默认映射 `5432:5432`，库名 / 用户 / 密码均为 `autosoft`（仅本地开发）。
+默认映射 `5432:5432`，库名 / 用户 / 密码均为 `autosoft`（仅本地开发）。镜像已包含 **pgvector** 扩展（阶段 7 P2 跨会话记忆所需）。
+
+**从旧版 `postgres:16` 升级**：若已有 volume 且未装 pgvector，需重建数据卷后启动：
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+首次启动 Flyway 会执行 `V1.0.0` 起的迁移（含阶段 6A 的 `V1.8.0__workflow.sql`、6C 的 `V1.9.0__wf_schedule.sql`、阶段 7 的 `V2.0.0__assistant.sql`、`V2.1.0__assistant_memory.sql` 与 `V2.2.0__page_visit.sql`）。
 
 **5432 被占用**：修改 `docker-compose.yml` 为 `15432:5432`，并把 `dev/auto-soft-boot/src/main/resources/application-dev.yml` 的 URL 改成 `jdbc:postgresql://127.0.0.1:15432/autosoft`。
-
-首次启动 Flyway 会执行 `V1.0.0` 起的迁移（含阶段 6A 的 `V1.8.0__workflow.sql` 与 6C 的 `V1.9.0__wf_schedule.sql`）。
 
 ## 3. 启动后端
 
@@ -89,7 +96,11 @@ npm run dev
 
 OpenCode / AES 开发占位：`application.yml` 的 `autosoft.opencode.base-url`、`autosoft.crypto.aes-key`。生产务必替换 JWT secret、AES 材料，并用环境变量注入 API Key。
 
-首次启动 Flyway 会执行 `V1.0.0`～`V1.5.0`。
+**助手跨会话记忆（P2）**：`autosoft.assistant.memory.enabled` 默认 `true`，Embedding 复用 OpenCode 的 API Key 与 `base-url`（调用 `/embeddings`）。无 pgvector 或 Embedding 不可用时，可设 `enabled: false` 回退 P1 行为。
+
+**页面访问埋点（P4）**：`autosoft.telemetry.page-visit.enabled` 默认 `true`；`retention-days: 90`；前端 `VITE_PAGE_VISIT_ENABLED=false` 可关闭上报。
+
+首次启动 Flyway 会执行 `V1.0.0`～`V2.2.0`。
 
 ## 5. 常见问题
 
@@ -97,6 +108,8 @@ OpenCode / AES 开发占位：`application.yml` 的 `autosoft.opencode.base-url`
 | --- | --- |
 | 后端起不来，连不上库 | 先 `docker compose ps`，确认容器 healthy/running；核对端口 |
 | Flyway 校验失败 | 开发空库可 `docker compose down -v` 后重建；**不要改已执行的 SQL 文件** |
+| pgvector 扩展不存在 | 确认 `docker-compose.yml` 使用 `pgvector/pgvector:pg16` 并重建 volume |
+| Embedding 失败但对话可用 | 正常降级行为；检查 OpenCode Key 与 `/embeddings` 是否可用 |
 | 前端提示无法连接后端 | 确认 8080 已启动；确认 `vite.config.ts` 里 proxy 指向 8080 |
 | 浏览器跨域 | 开发走 Vite 代理即可；若直连 8080，framework 已允许 `http://localhost:5173` |
 | `mvn` 编译失败、JDK 不对 | `java -version` 必须是 25+。本仓库 enforcer 要求 `[25,)`。若系统 `JAVA_HOME` 仍指向旧 JDK，编译前先切换，例如：`$env:JAVA_HOME="C:\Program Files\Java\JDK25\jdk-25+36"` |

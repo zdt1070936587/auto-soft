@@ -16,6 +16,8 @@ import { updatePassword } from '@/api/auth'
 import type { MenuVO } from '@/api/types'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
+import AssistantFab from '@/components/assistant/AssistantFab.vue'
+import AssistantPanel from '@/components/assistant/AssistantPanel.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -30,6 +32,15 @@ const passwordForm = reactive({
 
 const collapsed = computed(() => app.sidebarCollapsed)
 const openMenuKeys = ref<string[]>([])
+const assistantOpen = ref(false)
+
+const showAssistant = computed(
+  () => auth.loggedIn && auth.ready && (auth.hasPermission('assistant:use') || auth.isSuperAdmin),
+)
+
+function toggleAssistant() {
+  assistantOpen.value = !assistantOpen.value
+}
 
 interface SideItem {
   key: string
@@ -255,6 +266,8 @@ async function submitPassword() {
         </Form.Item>
       </Form>
     </Modal>
+    <AssistantFab v-if="showAssistant" @toggle="toggleAssistant" />
+    <AssistantPanel v-if="showAssistant" v-model:open="assistantOpen" />
   </Layout>
 </template>
 
