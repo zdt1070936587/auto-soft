@@ -4,6 +4,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * StepRedactor。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public final class StepRedactor {
 
     private static final Pattern SENSITIVE = Pattern.compile(

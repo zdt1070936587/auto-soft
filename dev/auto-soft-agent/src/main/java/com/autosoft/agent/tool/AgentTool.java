@@ -6,6 +6,9 @@ import java.util.Map;
 
 /**
  * Agent 可调用的平台工具。模型不能发明未注册名称。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public interface AgentTool {
 

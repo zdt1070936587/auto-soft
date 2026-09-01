@@ -1,5 +1,11 @@
 package com.autosoft.agent.vo;
 
+/**
+ * LlmConfig视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class LlmConfigVO {
 
     private String defaultModel;

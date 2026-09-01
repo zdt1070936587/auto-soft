@@ -15,6 +15,9 @@ import java.util.LinkedHashSet;
 
 /**
  * 每次请求按 userId 加载角色与权限。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class LoginUserLoaderImpl implements LoginUserLoader {

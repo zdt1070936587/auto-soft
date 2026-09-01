@@ -1,5 +1,11 @@
 package com.autosoft.meta.vo;
 
+/**
+ * MetaField视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class MetaFieldVO {
     private Long id;
     private Long entityId;

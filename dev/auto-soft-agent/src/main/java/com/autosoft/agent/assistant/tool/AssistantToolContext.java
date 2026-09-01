@@ -4,6 +4,9 @@ import com.autosoft.agent.entity.AiAssistantSessionDO;
 
 /**
  * Assistant 工具执行上下文。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class AssistantToolContext {
 

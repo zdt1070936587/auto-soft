@@ -2,6 +2,9 @@ package com.autosoft.common.core;
 
 /**
  * 统一业务状态码。成功固定为 0，前端以 code === 0 判断成功。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public enum ResultCode {
 

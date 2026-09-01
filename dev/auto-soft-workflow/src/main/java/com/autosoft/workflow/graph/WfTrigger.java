@@ -3,6 +3,12 @@ package com.autosoft.workflow.graph;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * WfTrigger。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WfTrigger {
 
     private String type;

@@ -31,6 +31,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Workflow执行器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Service
 public class WorkflowExecutor {
 

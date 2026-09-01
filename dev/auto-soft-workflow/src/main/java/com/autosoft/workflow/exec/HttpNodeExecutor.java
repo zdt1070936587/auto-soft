@@ -14,6 +14,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * HttpNode执行器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class HttpNodeExecutor implements NodeExecutor {
 

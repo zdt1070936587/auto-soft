@@ -5,6 +5,9 @@ import com.autosoft.common.exception.BizException;
 
 /**
  * 断言工具，失败时抛出 BizException。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class AssertUtils {
 

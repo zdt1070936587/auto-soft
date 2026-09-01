@@ -5,6 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Workflow配置属性。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @ConfigurationProperties(prefix = "autosoft.workflow")
 public class WorkflowProperties {
 

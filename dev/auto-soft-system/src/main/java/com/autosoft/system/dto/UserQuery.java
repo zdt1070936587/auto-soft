@@ -4,6 +4,9 @@ import com.autosoft.common.core.PageQuery;
 
 /**
  * 用户分页查询。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class UserQuery extends PageQuery {
 

@@ -5,6 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.Instant;
 
+/**
+ * AiMemoryEpisode实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("ai_memory_episode")
 public class AiMemoryEpisodeDO extends BaseDO {
 

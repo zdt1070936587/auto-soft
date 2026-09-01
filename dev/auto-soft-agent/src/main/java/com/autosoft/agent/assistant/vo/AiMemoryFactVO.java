@@ -2,6 +2,12 @@ package com.autosoft.agent.assistant.vo;
 
 import java.time.Instant;
 
+/**
+ * AiMemoryFact视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class AiMemoryFactVO {
 
     private Long id;

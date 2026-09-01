@@ -11,6 +11,9 @@ import java.util.regex.Pattern;
 
 /**
  * 相对时间解析（Assistant 操作历史问答）。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class RelativeTimeParser {
 

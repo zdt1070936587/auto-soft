@@ -15,6 +15,9 @@ import java.util.Map;
 
 /**
  * 页面访问埋点上报。无业务逻辑。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Validated
 @RestController

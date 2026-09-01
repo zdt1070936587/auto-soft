@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 
 /**
  * 阶段 B/C 图校验。未知类型与环直接拒绝。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class WorkflowGraphValidator {

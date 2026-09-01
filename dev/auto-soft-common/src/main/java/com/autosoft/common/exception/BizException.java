@@ -4,6 +4,9 @@ import com.autosoft.common.core.ResultCode;
 
 /**
  * 业务异常。由 Service / Manager 抛出，GlobalExceptionHandler 统一转换为 R。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class BizException extends RuntimeException {
 

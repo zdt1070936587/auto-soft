@@ -5,6 +5,9 @@ import java.util.List;
 
 /**
  * 当前登录用户。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class CurrentUserVO {
 

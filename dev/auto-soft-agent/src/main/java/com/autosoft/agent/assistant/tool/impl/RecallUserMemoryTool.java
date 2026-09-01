@@ -9,6 +9,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * RecallUserMemory工具。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class RecallUserMemoryTool implements AssistantTool {
 

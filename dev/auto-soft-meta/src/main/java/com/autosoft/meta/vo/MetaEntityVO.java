@@ -3,6 +3,12 @@ package com.autosoft.meta.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * MetaEntity视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class MetaEntityVO {
     private Long id;
     private Long appId;

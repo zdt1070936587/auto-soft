@@ -9,6 +9,9 @@ import java.time.Instant;
 
 /**
  * 插入/更新时填充审计字段。匿名请求（如登录）用户 ID 为 0。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class AuditMetaObjectHandler implements MetaObjectHandler {

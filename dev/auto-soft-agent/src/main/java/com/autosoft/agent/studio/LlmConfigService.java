@@ -18,6 +18,9 @@ import java.util.Map;
 
 /**
  * 系统级 LLM 配置。Key 只写不回显。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class LlmConfigService {

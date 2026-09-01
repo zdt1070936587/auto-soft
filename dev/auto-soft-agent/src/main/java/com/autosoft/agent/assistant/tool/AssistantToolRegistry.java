@@ -12,6 +12,9 @@ import java.util.Map;
 
 /**
  * Assistant 工具注册表。与 Studio ToolRegistry 完全分离。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class AssistantToolRegistry {

@@ -17,6 +17,9 @@ import java.util.HexFormat;
 
 /**
  * AES-256-GCM。禁止打印明文 Key。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class AesGcmCipher {

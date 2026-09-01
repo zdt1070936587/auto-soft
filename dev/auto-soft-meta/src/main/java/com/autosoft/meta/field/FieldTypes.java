@@ -8,6 +8,9 @@ import java.util.Set;
 
 /**
  * 字段类型白名单。DDL 只允许 switch 本枚举，禁止拼接 field_type 原文。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class FieldTypes {
 

@@ -6,6 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 工作室软暂停标记。按 sessionId 登记，下一轮模型调用前检查。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class TurnPauseRegistry {

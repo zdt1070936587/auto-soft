@@ -11,6 +11,14 @@
     <name>auto-soft</name>
     <description>AI 管理后台父工程</description>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <modules>
         <module>auto-soft-common</module>
         <module>auto-soft-framework</module>

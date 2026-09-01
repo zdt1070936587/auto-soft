@@ -9,6 +9,12 @@ import org.apache.ibatis.annotations.Select;
 
 import java.time.Instant;
 
+/**
+ * PageVisit数据访问。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Mapper
 public interface PageVisitMapper extends BaseMapper<PageVisitDO> {
 

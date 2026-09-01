@@ -3,6 +3,12 @@ package com.autosoft.workflow.exec;
 import com.autosoft.meta.runtime.WorkflowResumeHook;
 import org.springframework.stereotype.Component;
 
+/**
+ * WorkflowResume适配器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class WorkflowResumeAdapter implements WorkflowResumeHook {
 

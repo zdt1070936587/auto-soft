@@ -36,6 +36,9 @@ import java.util.stream.Collectors;
 
 /**
  * 工作室会话。仅会话所属开发者可访问。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class StudioSessionService {

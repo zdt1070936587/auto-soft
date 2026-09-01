@@ -9,6 +9,9 @@ import java.util.Map;
 
 /**
  * Anthropic Messages。MVP 提示改选 Chat 模型，避免半成品协议。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class AnthropicMessagesClient {

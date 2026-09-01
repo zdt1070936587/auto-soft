@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * 启用/停用。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class StatusUpdateDTO {
 

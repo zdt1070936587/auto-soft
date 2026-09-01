@@ -2,6 +2,9 @@ package com.autosoft.meta.runtime;
 
 /**
  * 审批实例全部办完后回调。workflow 实现以唤醒 paused 的运行。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public interface WorkflowResumeHook {
 

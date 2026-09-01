@@ -3,6 +3,12 @@ package com.autosoft.agent.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * AiMessage实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("ai_message")
 public class AiMessageDO extends BaseDO {
 

@@ -12,6 +12,9 @@ import java.util.List;
 
 /**
  * 当前用户页面浏览记录查询（Assistant 专用）。强制 user_id 隔离。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class PageVisitUserQueryService {

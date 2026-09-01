@@ -1,5 +1,11 @@
 package com.autosoft.workflow.vo;
 
+/**
+ * WorkflowStep视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowStepVO {
 
     private Long id;

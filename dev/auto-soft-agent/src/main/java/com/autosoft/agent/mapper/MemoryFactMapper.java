@@ -10,6 +10,12 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
+/**
+ * MemoryFact数据访问。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public interface MemoryFactMapper extends BaseMapper<AiMemoryFactDO> {
 
     @Insert("""

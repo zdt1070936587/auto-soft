@@ -6,6 +6,9 @@ import java.util.List;
 
 /**
  * 分配角色。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class RoleIdsDTO {
 

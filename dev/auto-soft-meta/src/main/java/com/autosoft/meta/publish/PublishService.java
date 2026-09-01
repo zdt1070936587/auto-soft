@@ -33,6 +33,9 @@ import java.util.List;
 
 /**
  * 发布：admin 先 DDL；frontend/h5 跳过低代码页 DDL。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class PublishService {

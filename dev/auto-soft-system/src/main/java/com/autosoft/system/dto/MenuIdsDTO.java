@@ -7,6 +7,9 @@ import java.util.List;
 
 /**
  * 分配菜单。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class MenuIdsDTO {
 

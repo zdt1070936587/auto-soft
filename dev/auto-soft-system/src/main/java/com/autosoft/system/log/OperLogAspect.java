@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * 切 @OperLog，失败也记一条。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Aspect
 @Component

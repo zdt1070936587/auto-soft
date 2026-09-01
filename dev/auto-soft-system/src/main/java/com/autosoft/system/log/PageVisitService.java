@@ -16,6 +16,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * PageVisit业务服务。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Service
 public class PageVisitService {
 

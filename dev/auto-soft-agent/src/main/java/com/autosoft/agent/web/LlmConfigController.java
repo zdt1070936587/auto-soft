@@ -16,6 +16,9 @@ import java.util.List;
 
 /**
  * 模型设置。仅超管。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/system")

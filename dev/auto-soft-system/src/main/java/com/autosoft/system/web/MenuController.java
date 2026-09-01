@@ -13,6 +13,9 @@ import java.util.List;
 
 /**
  * 菜单查询入口。无业务逻辑。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/menus")

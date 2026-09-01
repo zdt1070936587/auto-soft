@@ -4,6 +4,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * JWT 配置。生产环境请用环境变量覆盖 secret。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @ConfigurationProperties(prefix = "autosoft.jwt")
 public class JwtProperties {

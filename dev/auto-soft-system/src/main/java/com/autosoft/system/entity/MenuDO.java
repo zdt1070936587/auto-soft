@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * 系统菜单。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @TableName("sys_menu")
 public class MenuDO extends BaseDO {

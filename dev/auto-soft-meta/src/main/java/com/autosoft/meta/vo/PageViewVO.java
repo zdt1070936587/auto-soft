@@ -1,5 +1,11 @@
 package com.autosoft.meta.vo;
 
+/**
+ * PageView视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class PageViewVO {
 
     private String appCode;

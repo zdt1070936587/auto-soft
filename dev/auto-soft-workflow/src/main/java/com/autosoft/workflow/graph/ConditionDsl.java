@@ -17,6 +17,9 @@ import java.util.Map;
 
 /**
  * 受控条件 DSL。禁止 eval / ScriptEngine。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class ConditionDsl {
 

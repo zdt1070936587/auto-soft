@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * NoopFlowStart端口。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 @ConditionalOnMissingBean(FlowStartPort.class)
 public class NoopFlowStartPort implements FlowStartPort {

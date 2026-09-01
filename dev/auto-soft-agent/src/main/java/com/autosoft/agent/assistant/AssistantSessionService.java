@@ -20,6 +20,9 @@ import java.util.List;
 
 /**
  * 全局助手会话 CRUD。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class AssistantSessionService {

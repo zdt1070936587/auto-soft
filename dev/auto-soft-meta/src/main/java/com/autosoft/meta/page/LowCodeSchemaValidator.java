@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * LowCodeSchema校验器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public final class LowCodeSchemaValidator {
 
     private static final Set<String> BLOCK_TYPES = Set.of(

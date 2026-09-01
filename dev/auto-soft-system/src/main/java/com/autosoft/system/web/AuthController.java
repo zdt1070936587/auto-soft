@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 认证入口。无业务逻辑。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/auth")

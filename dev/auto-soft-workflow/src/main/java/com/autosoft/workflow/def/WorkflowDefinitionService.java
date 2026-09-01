@@ -42,6 +42,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * WorkflowDefinition业务服务。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Service
 public class WorkflowDefinitionService {
 

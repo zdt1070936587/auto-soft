@@ -37,6 +37,9 @@ import java.util.Map;
 
 /**
  * 单线审批封装。驳回终止当前实例，再次提交 start 新实例。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class FlowManager implements FlowHook, FlowSubmitHook, FlowBinder, FlowStartPort {

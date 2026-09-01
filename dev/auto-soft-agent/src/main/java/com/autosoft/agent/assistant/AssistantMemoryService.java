@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * AssistantMemory业务服务。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Service
 public class AssistantMemoryService {
 

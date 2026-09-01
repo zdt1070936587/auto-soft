@@ -21,6 +21,9 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Security 401/403 输出统一 R，不返回默认登录 HTML。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class SecurityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {

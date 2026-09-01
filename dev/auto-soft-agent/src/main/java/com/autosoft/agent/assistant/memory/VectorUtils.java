@@ -4,6 +4,9 @@ import java.util.Locale;
 
 /**
  * pgvector 字面量工具。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class VectorUtils {
 

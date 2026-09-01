@@ -10,6 +10,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * BindFlow工具。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class BindFlowTool implements AgentTool {
 

@@ -1,5 +1,11 @@
 package com.autosoft.agent.dto;
 
+/**
+ * UpdateMode传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class UpdateModeDTO {
 
     private String agentMode;

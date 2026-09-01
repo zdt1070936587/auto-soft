@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Min;
 
 /**
  * 分页查询入参。current 从 1 开始，size 上限 200。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class PageQuery {
 

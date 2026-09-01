@@ -3,6 +3,12 @@ package com.autosoft.flow.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * MetaEntityFlow实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("meta_entity_flow")
 public class MetaEntityFlowDO extends BaseDO {
     private Long entityId;

@@ -2,6 +2,12 @@ package com.autosoft.workflow.graph;
 
 import java.util.Set;
 
+/**
+ * NodeTypes。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public final class NodeTypes {
 
     public static final String START = "start";

@@ -10,6 +10,9 @@ import java.util.Set;
 
 /**
  * 当前登录用户，放入 SecurityContext。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class LoginUser implements Serializable {
 

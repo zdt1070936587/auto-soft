@@ -3,8 +3,8 @@
 AI 管理后台：用户通过自然语言与系统对话，即可生成自己需要的后台功能（动态 CRUD + 审批流）。
 
 打开前端进入太阳系登录页；默认账号见 [docs/dev-setup.md](docs/dev-setup.md)。整体计划见 [docs/分阶段开发计划.md](docs/分阶段开发计划.md)。
-![img.png](img.png)
-![img_1.png](img_1.png)
+![img.png](files/img.png)
+![img_1.png](files/img_1.png)
 ## 目录总览
 
 ```
@@ -12,7 +12,9 @@ auto-soft/
 ├── docs/                 # 设计文档、接口、数据库约定、开发规范
 ├── dev/                  # Java / Spring Boot 4 后端（Maven 多模块）
 ├── web/                  # Vue 3 + Vite + TypeScript 前端
+├── files/                # 项目静态资源（README 截图等）
 ├── docker-compose.yml    # 本地 PostgreSQL 16
+├── LICENSE               # Apache License 2.0
 ├── .editorconfig
 └── README.md
 ```

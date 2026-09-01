@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * 登录入参。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class LoginDTO {
 

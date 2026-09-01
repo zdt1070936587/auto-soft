@@ -9,6 +9,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PreviewApp工具。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class PreviewAppTool implements AgentTool {
 

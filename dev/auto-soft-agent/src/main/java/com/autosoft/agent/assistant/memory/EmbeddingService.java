@@ -9,6 +9,9 @@ import java.util.Optional;
 
 /**
  * 向量化封装：截断、失败降级标记。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class EmbeddingService {

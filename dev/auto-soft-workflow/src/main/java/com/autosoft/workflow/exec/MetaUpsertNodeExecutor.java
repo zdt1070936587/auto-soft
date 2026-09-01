@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * MetaUpsertNode执行器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class MetaUpsertNodeExecutor implements NodeExecutor {
 

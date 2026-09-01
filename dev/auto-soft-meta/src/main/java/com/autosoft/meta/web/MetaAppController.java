@@ -24,6 +24,9 @@ import java.util.List;
 
 /**
  * 元数据建模入口。无业务逻辑。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/meta")

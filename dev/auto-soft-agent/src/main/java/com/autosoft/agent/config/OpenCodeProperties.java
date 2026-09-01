@@ -2,6 +2,12 @@ package com.autosoft.agent.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * OpenCode配置属性。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @ConfigurationProperties(prefix = "autosoft.opencode")
 public class OpenCodeProperties {
 

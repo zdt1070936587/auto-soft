@@ -4,6 +4,9 @@ import com.autosoft.common.core.PageQuery;
 
 /**
  * 角色分页查询。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class RoleQuery extends PageQuery {
 

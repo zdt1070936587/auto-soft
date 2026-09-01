@@ -27,6 +27,9 @@ import java.util.List;
 
 /**
  * 角色维护。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class RoleService {

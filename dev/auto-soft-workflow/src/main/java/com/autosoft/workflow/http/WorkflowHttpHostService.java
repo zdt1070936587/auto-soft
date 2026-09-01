@@ -21,6 +21,9 @@ import java.util.regex.Pattern;
 
 /**
  * 工作流 HTTP 出站域名白名单。合并 yml 静态配置与数据库记录。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class WorkflowHttpHostService {

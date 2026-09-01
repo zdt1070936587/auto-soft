@@ -3,6 +3,12 @@ package com.autosoft.workflow.graph;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * WorkflowGraph。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowGraph {
 
     private int version = 1;

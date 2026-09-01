@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Pattern;
 
 /**
  * 创建角色。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class RoleCreateDTO {
 

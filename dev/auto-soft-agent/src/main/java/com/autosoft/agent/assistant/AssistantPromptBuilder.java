@@ -12,6 +12,9 @@ import java.util.Map;
 
 /**
  * 全局助手系统提示与历史组装。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class AssistantPromptBuilder {
 

@@ -4,6 +4,9 @@ import java.time.Instant;
 
 /**
  * 健康检查出参。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class HealthVO {
 

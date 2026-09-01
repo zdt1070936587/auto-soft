@@ -11,6 +11,9 @@ import java.util.Set;
 
 /**
  * 操作日志详情展示脱敏。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class OperLogDisplaySanitizer {

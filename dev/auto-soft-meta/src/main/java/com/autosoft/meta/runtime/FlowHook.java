@@ -2,6 +2,9 @@ package com.autosoft.meta.runtime;
 
 /**
  * 流程钩子。阶段 2 默认空实现；阶段 4 由 flow 模块提供。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public interface FlowHook {
 

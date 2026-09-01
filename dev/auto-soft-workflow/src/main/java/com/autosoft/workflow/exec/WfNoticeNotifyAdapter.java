@@ -9,6 +9,12 @@ import com.autosoft.workflow.mapper.WfNoticeMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Component;
 
+/**
+ * WfNoticeNotify适配器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class WfNoticeNotifyAdapter implements WorkflowNotifyPort {
 

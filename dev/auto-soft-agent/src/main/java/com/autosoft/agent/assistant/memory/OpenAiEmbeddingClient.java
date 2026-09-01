@@ -19,6 +19,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * OpenAiEmbeddingClient。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class OpenAiEmbeddingClient implements EmbeddingPort {
 

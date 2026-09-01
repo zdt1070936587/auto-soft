@@ -2,6 +2,9 @@ package com.autosoft.system.vo;
 
 /**
  * 角色展示。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class RoleVO {
 

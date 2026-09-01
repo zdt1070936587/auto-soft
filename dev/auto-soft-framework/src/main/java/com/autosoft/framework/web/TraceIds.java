@@ -4,6 +4,9 @@ import org.slf4j.MDC;
 
 /**
  * 当前请求 traceId。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class TraceIds {
 

@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 
 /**
  * 工作室附件：上传、校验、入模内容组装。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class StudioAttachmentService {

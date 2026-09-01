@@ -6,6 +6,9 @@ import java.util.List;
 
 /**
  * 用户展示，不含密码。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class UserVO {
 

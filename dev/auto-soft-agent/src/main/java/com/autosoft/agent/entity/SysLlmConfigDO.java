@@ -3,6 +3,12 @@ package com.autosoft.agent.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * SysLlmConfig实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("sys_llm_config")
 public class SysLlmConfigDO extends BaseDO {
 

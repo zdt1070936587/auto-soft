@@ -2,6 +2,12 @@ package com.autosoft.agent.assistant.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * AssistantMemory配置属性。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @ConfigurationProperties(prefix = "autosoft.assistant.memory")
 public class AssistantMemoryProperties {
 

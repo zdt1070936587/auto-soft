@@ -13,6 +13,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * MemoryConsolidation定时任务。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class MemoryConsolidationJob {
 

@@ -7,6 +7,9 @@ import java.util.Set;
 
 /**
  * 工作室工作级别：讨论 / 计划 / 开发。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public enum AgentMode {
 

@@ -4,6 +4,12 @@ import com.autosoft.agent.entity.AiAttachmentDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+ * AiAttachment数据访问。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Mapper
 public interface AiAttachmentMapper extends BaseMapper<AiAttachmentDO> {
 }

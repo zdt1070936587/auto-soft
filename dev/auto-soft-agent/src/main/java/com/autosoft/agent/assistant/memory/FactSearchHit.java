@@ -2,6 +2,12 @@ package com.autosoft.agent.assistant.memory;
 
 import java.time.Instant;
 
+/**
+ * FactSearchHit。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class FactSearchHit {
 
     private Long id;

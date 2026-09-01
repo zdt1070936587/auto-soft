@@ -8,6 +8,9 @@ import tools.jackson.databind.cfg.DateTimeFeature;
 
 /**
  * Jackson 3 约定：ISO-8601 时间、忽略未知字段。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Configuration
 public class JacksonConfig {

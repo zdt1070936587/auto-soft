@@ -15,6 +15,9 @@ import java.util.Map;
 
 /**
  * OpenCode Go 入口。禁止打印 API Key。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class OpenCodeGoManager {

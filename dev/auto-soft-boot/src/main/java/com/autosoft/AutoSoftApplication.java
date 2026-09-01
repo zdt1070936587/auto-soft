@@ -10,6 +10,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = "com.autosoft")
 @MapperScan({"com.autosoft.system.mapper", "com.autosoft.meta.mapper", "com.autosoft.agent.mapper",
         "com.autosoft.flow.mapper", "com.autosoft.workflow.mapper"})
+
+/**
+ * AutoSoftApplication。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class AutoSoftApplication {
 
     public static void main(String[] args) {

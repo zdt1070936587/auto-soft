@@ -2,6 +2,12 @@ package com.autosoft.meta.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * MetaAppSave传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class MetaAppSaveDTO {
     @NotBlank
     private String code;

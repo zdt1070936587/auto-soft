@@ -10,6 +10,12 @@ import org.springframework.web.client.RestClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
+/**
+ * WorkflowInfra配置。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Configuration
 @EnableScheduling
 @EnableConfigurationProperties(WorkflowProperties.class)

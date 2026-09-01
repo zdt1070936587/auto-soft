@@ -10,6 +10,9 @@ import java.util.Map;
 
 /**
  * 按 modelId 选择协议。上层只暴露 streamChat/chat。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class ModelProtocolRouter {

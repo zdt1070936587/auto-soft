@@ -3,6 +3,12 @@ package com.autosoft.flow.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * FlowDefinition实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("sys_flow_definition")
 public class FlowDefinitionDO extends BaseDO {
     private String flowCode;

@@ -27,6 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 工作流定义与运行入口。无执行器细节。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/wf")

@@ -12,6 +12,9 @@ import java.util.Locale;
 
 /**
  * HTTP 节点 SSRF 防护：必须在白名单，且拒绝环回/私网/元数据地址。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class HttpHostGuard {
 

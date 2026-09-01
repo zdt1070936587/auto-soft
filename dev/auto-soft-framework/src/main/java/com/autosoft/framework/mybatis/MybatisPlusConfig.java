@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * MyBatis-Plus 分页（PostgreSQL）。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Configuration
 public class MybatisPlusConfig {

@@ -29,6 +29,9 @@ import java.util.Map;
 
 /**
  * 动态 CRUD SQL。列名/排序仅来自白名单，值全部 bind。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class RuntimeSqlManager {

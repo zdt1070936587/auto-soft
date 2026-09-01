@@ -2,6 +2,12 @@ package com.autosoft.system.dto;
 
 import com.autosoft.common.core.PageQuery;
 
+/**
+ * OperLog查询条件。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class OperLogQuery extends PageQuery {
 
     private String module;

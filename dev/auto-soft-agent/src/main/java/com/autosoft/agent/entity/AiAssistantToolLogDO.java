@@ -3,6 +3,12 @@ package com.autosoft.agent.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * AiAssistantToolLog实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("ai_assistant_tool_log")
 public class AiAssistantToolLogDO extends BaseDO {
 

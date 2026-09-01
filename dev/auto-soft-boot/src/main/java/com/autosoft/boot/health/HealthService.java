@@ -7,6 +7,9 @@ import java.time.Instant;
 
 /**
  * 健康检查编排。主方法只写步骤，逐步填充 VO。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class HealthService {

@@ -7,6 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * 从 SecurityContext 读取当前用户。Controller 不要自行解析 token。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class SecurityUtils {
 

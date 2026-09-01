@@ -7,6 +7,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * GraphSecrets。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public final class GraphSecrets {
 
     private static final Set<String> KEYS = Set.of(

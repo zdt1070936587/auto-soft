@@ -2,6 +2,12 @@ package com.autosoft.agent.assistant.memory;
 
 import java.time.Instant;
 
+/**
+ * EpisodeSearchHit。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class EpisodeSearchHit {
 
     private Long id;

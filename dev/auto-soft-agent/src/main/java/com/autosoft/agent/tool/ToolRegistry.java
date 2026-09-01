@@ -16,6 +16,9 @@ import java.util.Set;
 
 /**
  * 已注册工具表。未知工具名直接失败。按 app_kind 互斥。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class ToolRegistry {

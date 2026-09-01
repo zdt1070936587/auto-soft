@@ -3,6 +3,12 @@ package com.autosoft.meta.app;
 import com.autosoft.common.core.ResultCode;
 import com.autosoft.common.exception.BizException;
 
+/**
+ * AppKind。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public enum AppKind {
 
     ADMIN("admin"),

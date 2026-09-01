@@ -20,6 +20,9 @@ import java.util.Date;
 
 /**
  * 签发与解析 JWT，不含权限声明（权限每次查库）。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class JwtManager {

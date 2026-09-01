@@ -12,6 +12,9 @@ import java.util.Map;
 
 /**
  * 图 JSON 编解码。兼容 input_schema / inputSchema。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class GraphCodec {
 

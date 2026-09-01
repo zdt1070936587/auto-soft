@@ -10,6 +10,9 @@ import java.time.Instant;
 
 /**
  * 带审计与逻辑删除的基础实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public abstract class BaseDO {
 

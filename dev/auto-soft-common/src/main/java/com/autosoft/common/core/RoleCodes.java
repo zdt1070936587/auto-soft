@@ -2,6 +2,9 @@ package com.autosoft.common.core;
 
 /**
  * 内置角色编码，种子数据必须存在，禁止删除。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class RoleCodes {
 

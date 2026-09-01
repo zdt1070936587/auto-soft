@@ -6,6 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * PageVisitRetention定时任务。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class PageVisitRetentionJob {
 

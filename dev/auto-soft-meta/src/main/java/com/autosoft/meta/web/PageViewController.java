@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 低代码页面运行时入口。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/runtime/{app}/pages/{page}")

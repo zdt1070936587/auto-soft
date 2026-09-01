@@ -19,6 +19,9 @@ import java.util.Map;
 
 /**
  * OpenAI Chat Completions（tool calling 主路径）。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class ChatCompletionsClient {

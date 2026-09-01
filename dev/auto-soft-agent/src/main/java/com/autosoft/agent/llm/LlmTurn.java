@@ -5,6 +5,9 @@ import java.util.List;
 
 /**
  * 一次模型回合结果。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class LlmTurn {
 

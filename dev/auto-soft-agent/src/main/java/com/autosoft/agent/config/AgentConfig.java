@@ -8,6 +8,12 @@ import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
 
+/**
+ * Agent配置。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Configuration
 @EnableConfigurationProperties({CryptoProperties.class, OpenCodeProperties.class, StudioUploadProperties.class})
 public class AgentConfig {

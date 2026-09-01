@@ -9,6 +9,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * WorkflowGraphEditor。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public final class WorkflowGraphEditor {
 
     private WorkflowGraphEditor() {

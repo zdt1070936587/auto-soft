@@ -12,6 +12,9 @@ import org.springframework.util.StringUtils;
 
 /**
  * 操作日志查询。仅超管入口调用。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class OperLogQueryService {

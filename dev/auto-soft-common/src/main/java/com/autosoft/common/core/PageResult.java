@@ -5,6 +5,9 @@ import java.util.List;
 
 /**
  * 分页查询出参。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class PageResult<T> {
 

@@ -3,6 +3,12 @@ package com.autosoft.meta.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * MetaApp实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("meta_app")
 public class MetaAppDO extends BaseDO {
 

@@ -4,6 +4,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * 认证开关。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @ConfigurationProperties(prefix = "autosoft.auth")
 public class AuthProperties {

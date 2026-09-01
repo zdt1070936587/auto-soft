@@ -6,6 +6,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * EndNode执行器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class EndNodeExecutor implements NodeExecutor {
 

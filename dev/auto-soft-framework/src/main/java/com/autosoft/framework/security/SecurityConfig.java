@@ -18,6 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * JWT 无状态安全链。CORS 仍由 WebMvcConfig 处理，此处不再重复配置。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Configuration
 @EnableWebSecurity

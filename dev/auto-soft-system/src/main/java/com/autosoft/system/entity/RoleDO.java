@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * 系统角色。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @TableName("sys_role")
 public class RoleDO extends BaseDO {

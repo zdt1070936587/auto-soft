@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Pattern;
 
 /**
  * 管理员重置密码。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class ResetPasswordDTO {
 

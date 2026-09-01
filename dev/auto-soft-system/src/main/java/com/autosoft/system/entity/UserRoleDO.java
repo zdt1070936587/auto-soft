@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
  * 用户-角色关联。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @TableName("sys_user_role")
 public class UserRoleDO {

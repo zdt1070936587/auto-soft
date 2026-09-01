@@ -12,6 +12,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * SearchMenus工具。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class SearchMenusTool implements AssistantTool {
 

@@ -1,3 +1,9 @@
+/**
+ * 模块说明。
+ *
+ * @author zhaodt
+ * @since 2026-08-20
+ */
 package com.autosoft.framework.log;
 
 import java.lang.annotation.Documented;

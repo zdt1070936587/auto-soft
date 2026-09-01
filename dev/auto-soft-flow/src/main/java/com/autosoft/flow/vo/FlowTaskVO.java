@@ -2,6 +2,12 @@ package com.autosoft.flow.vo;
 
 import java.time.Instant;
 
+/**
+ * FlowTask视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class FlowTaskVO {
 
     private Long taskId;

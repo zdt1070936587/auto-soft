@@ -19,6 +19,9 @@ import java.util.Map;
 
 /**
  * 动态 CRUD 入口。无业务逻辑。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/runtime/{app}/{entity}")

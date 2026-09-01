@@ -3,6 +3,12 @@ package com.autosoft.workflow.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * WfRun实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("wf_run")
 public class WfRunDO extends BaseDO {
 

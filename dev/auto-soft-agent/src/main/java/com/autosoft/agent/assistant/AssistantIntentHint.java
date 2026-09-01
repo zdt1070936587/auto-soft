@@ -6,6 +6,9 @@ import java.util.Set;
 
 /**
  * 轻量意图 hint，供 Prompt 注入。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class AssistantIntentHint {
 

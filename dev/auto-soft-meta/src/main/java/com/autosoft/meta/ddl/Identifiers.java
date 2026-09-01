@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
 
 /**
  * 动态表/列标识符白名单。禁止把请求参数直接拼进 SQL 标识符。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class Identifiers {
 

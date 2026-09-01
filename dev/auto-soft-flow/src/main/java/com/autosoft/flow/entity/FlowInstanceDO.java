@@ -3,6 +3,12 @@ package com.autosoft.flow.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * FlowInstance实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("sys_flow_instance")
 public class FlowInstanceDO extends BaseDO {
     private Long definitionId;

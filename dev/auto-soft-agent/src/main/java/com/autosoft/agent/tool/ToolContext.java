@@ -7,6 +7,9 @@ import com.autosoft.common.exception.BizException;
 
 /**
  * 工具执行上下文。一次会话只绑定一个 app。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class ToolContext {
 

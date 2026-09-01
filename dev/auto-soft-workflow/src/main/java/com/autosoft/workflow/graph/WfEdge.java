@@ -1,5 +1,11 @@
 package com.autosoft.workflow.graph;
 
+/**
+ * WfEdge。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WfEdge {
 
     private String from;

@@ -16,6 +16,9 @@ import java.util.Set;
 
 /**
  * 仅允许 dyn_ 前缀建表与 ADD COLUMN。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class DdlManager {

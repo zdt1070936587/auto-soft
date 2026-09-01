@@ -1,5 +1,11 @@
 package com.autosoft.workflow.dto;
 
+/**
+ * WorkflowShare传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowShareDTO {
 
     private String permission = "preview";

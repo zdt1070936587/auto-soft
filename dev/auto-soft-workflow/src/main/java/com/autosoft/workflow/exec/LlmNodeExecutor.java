@@ -8,6 +8,12 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * LlmNode执行器。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 public class LlmNodeExecutor implements NodeExecutor {
 

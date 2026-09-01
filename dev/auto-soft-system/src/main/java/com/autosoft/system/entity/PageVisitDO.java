@@ -6,6 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.Instant;
 
+/**
+ * PageVisit实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("sys_page_visit")
 public class PageVisitDO {
 

@@ -3,6 +3,12 @@ package com.autosoft.meta.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * RuntimeSchema视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class RuntimeSchemaVO {
     private String appCode;
     private String appName;

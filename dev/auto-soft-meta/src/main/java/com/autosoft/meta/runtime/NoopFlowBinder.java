@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * NoopFlowBinder。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Component
 @ConditionalOnMissingBean(FlowBinder.class)
 public class NoopFlowBinder implements FlowBinder {

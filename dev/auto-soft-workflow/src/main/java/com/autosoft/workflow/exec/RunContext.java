@@ -3,6 +3,12 @@ package com.autosoft.workflow.exec;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * RunContext。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class RunContext {
 
     private final Long runId;

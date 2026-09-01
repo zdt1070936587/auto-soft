@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * 更新角色，不可改 code。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class RoleUpdateDTO {
 

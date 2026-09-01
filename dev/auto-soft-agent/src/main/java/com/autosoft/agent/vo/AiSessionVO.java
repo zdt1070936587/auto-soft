@@ -2,6 +2,12 @@ package com.autosoft.agent.vo;
 
 import java.time.Instant;
 
+/**
+ * AiSession视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class AiSessionVO {
 
     private Long id;

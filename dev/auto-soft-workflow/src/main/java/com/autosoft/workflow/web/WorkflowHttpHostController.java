@@ -19,6 +19,9 @@ import java.util.List;
 
 /**
  * 工作流 HTTP 出站域名白名单。仅超管。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Validated
 @RestController

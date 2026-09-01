@@ -11,6 +11,9 @@ import java.util.Map;
 
 /**
  * 系统提示与历史组装。超长截断旧 tool 结果。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public final class PromptBuilder {
 

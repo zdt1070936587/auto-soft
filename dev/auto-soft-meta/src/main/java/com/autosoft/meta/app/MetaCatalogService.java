@@ -30,6 +30,9 @@ import java.util.List;
 
 /**
  * 元数据维护。发布后 code 不可改。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class MetaCatalogService {

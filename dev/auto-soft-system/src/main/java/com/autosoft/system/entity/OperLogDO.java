@@ -6,6 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.Instant;
 
+/**
+ * OperLog实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("sys_oper_log")
 public class OperLogDO {
 

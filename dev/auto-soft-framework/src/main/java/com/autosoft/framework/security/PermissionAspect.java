@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * 校验 @RequiresPermission。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Aspect
 @Component

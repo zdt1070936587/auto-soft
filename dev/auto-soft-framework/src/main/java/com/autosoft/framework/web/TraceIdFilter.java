@@ -15,6 +15,9 @@ import java.util.UUID;
 
 /**
  * 为每个请求分配 traceId，写入 MDC 与响应头。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)

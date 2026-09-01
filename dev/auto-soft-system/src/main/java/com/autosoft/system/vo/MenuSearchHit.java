@@ -2,6 +2,9 @@ package com.autosoft.system.vo;
 
 /**
  * 菜单搜索结果（Assistant search_menus）。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class MenuSearchHit {
 

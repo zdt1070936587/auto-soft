@@ -5,6 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.Instant;
 
+/**
+ * WfShare实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("wf_share")
 public class WfShareDO extends BaseDO {
 

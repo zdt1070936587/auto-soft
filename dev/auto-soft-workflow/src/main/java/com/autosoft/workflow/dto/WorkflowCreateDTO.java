@@ -2,6 +2,12 @@ package com.autosoft.workflow.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * WorkflowCreate传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowCreateDTO {
 
     @NotBlank

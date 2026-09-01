@@ -3,6 +3,12 @@ package com.autosoft.workflow.vo;
 import java.time.Instant;
 import java.util.Map;
 
+/**
+ * WorkflowShare视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowShareVO {
 
     private String token;

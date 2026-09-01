@@ -6,6 +6,9 @@ import java.util.Map;
 
 /**
  * 全局助手专用工具接口（与 Studio AgentTool 分离）。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public interface AssistantTool {
 

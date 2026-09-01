@@ -24,6 +24,9 @@ import java.util.List;
 
 /**
  * 角色维护入口。无业务逻辑。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Validated
 @RestController

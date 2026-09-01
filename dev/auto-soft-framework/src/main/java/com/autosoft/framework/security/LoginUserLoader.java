@@ -2,6 +2,9 @@ package com.autosoft.framework.security;
 
 /**
  * 按用户 ID 加载登录上下文。由 system 模块实现，避免 framework 依赖业务表。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public interface LoginUserLoader {
 

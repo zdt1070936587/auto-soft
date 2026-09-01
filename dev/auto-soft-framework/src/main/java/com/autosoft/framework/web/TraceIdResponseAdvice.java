@@ -11,6 +11,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
  * 统一把 MDC 中的 traceId 写入 {@link R}。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestControllerAdvice(basePackages = "com.autosoft")
 public class TraceIdResponseAdvice implements ResponseBodyAdvice<Object> {

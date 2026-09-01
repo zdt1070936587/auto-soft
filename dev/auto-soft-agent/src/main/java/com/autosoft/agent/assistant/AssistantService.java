@@ -35,6 +35,9 @@ import java.util.Map;
 
 /**
  * 全局助手对话编排。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class AssistantService {

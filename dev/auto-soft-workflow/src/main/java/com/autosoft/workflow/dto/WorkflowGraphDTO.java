@@ -4,6 +4,12 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Map;
 
+/**
+ * WorkflowGraph传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowGraphDTO {
 
     @NotNull

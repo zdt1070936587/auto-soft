@@ -25,6 +25,9 @@ import java.util.Map;
 
 /**
  * 动态运行时。步骤：解析 → 加载元数据 → 鉴权 → SQL。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class RuntimeService {

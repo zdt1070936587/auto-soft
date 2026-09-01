@@ -5,6 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.Instant;
 
+/**
+ * WfSchedule实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("wf_schedule")
 public class WfScheduleDO extends BaseDO {
 

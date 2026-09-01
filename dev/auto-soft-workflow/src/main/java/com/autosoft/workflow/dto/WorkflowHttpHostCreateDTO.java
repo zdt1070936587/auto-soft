@@ -3,6 +3,12 @@ package com.autosoft.workflow.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * WorkflowHttpHostCreate传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowHttpHostCreateDTO {
 
     @NotBlank(message = "host 不能为空")

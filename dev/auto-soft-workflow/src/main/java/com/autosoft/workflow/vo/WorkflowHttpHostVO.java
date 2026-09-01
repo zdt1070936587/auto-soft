@@ -2,6 +2,12 @@ package com.autosoft.workflow.vo;
 
 import java.time.Instant;
 
+/**
+ * WorkflowHttpHost视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class WorkflowHttpHostVO {
 
     private Long id;

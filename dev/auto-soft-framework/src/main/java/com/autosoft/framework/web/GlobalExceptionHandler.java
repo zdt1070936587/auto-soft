@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 
 /**
  * 全局异常处理。记录完整堆栈，响应体不返回堆栈。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestControllerAdvice(basePackages = "com.autosoft")
 public class GlobalExceptionHandler {

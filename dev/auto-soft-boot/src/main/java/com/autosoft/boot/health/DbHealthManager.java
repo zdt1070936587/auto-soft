@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * 数据库探活。只负责 SELECT 1，不向调用方抛出连接异常。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class DbHealthManager {

@@ -2,6 +2,9 @@ package com.autosoft.common.core;
 
 /**
  * 账号启用状态。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public enum UserStatus {
 

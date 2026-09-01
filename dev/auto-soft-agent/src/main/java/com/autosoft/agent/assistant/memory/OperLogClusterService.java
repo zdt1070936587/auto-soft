@@ -14,6 +14,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * OperLogCluster业务服务。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @Service
 public class OperLogClusterService {
 

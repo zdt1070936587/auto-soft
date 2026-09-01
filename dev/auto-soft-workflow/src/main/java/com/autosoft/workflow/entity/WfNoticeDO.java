@@ -3,6 +3,12 @@ package com.autosoft.workflow.entity;
 import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * WfNotice实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("wf_notice")
 public class WfNoticeDO extends BaseDO {
 

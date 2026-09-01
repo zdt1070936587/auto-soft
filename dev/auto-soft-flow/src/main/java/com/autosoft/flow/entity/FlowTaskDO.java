@@ -4,6 +4,12 @@ import com.autosoft.system.entity.BaseDO;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+/**
+ * FlowTask实体。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 @TableName("sys_flow_task")
 public class FlowTaskDO extends BaseDO {
     private Long instanceId;

@@ -21,6 +21,9 @@ import java.util.Set;
 
 /**
  * 写入操作日志。详情脱敏。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class OperLogManager {

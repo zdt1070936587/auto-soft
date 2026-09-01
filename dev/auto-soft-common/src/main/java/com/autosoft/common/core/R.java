@@ -2,6 +2,9 @@ package com.autosoft.common.core;
 
 /**
  * 统一 API 返回包装。Controller 必须返回本类型，禁止裸 Map。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class R<T> {
 

@@ -1,5 +1,11 @@
 package com.autosoft.agent.vo;
 
+/**
+ * AiAttachment视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class AiAttachmentVO {
 
     private Long id;

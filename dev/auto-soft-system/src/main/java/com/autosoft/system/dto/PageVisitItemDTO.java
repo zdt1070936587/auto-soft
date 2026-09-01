@@ -5,6 +5,12 @@ import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 
+/**
+ * PageVisitItem传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class PageVisitItemDTO {
 
     @NotBlank(message = "path 不能为空")

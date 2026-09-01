@@ -4,6 +4,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * AiMessage视图对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class AiMessageVO {
 
     private Long id;

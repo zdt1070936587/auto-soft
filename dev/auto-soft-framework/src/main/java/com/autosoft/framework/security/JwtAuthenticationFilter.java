@@ -21,6 +21,9 @@ import java.util.Collections;
 
 /**
  * 解析 Bearer JWT 并写入 SecurityContext。权限每次查库。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 
 /**
  * 菜单树与权限集合。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class MenuService {

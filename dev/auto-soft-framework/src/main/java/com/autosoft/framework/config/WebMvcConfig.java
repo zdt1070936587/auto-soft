@@ -6,6 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Web MVC 配置：开发环境跨域。阶段 1 再引入鉴权。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {

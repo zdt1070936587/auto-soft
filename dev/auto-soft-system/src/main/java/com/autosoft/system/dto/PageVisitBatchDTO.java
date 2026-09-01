@@ -6,6 +6,12 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
+/**
+ * PageVisitBatch传输对象。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public class PageVisitBatchDTO {
 
     @NotEmpty(message = "visits 不能为空")

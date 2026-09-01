@@ -7,6 +7,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * TemplateRenderer。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public final class TemplateRenderer {
 
     private static final Pattern TEMPLATE = Pattern.compile("\\{\\{\\s*([a-z][a-z0-9_]*)(?:\\.([A-Za-z0-9_]+))?\\s*}}");

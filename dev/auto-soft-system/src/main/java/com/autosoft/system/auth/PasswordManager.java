@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * 密码哈希，不承担业务编排。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Component
 public class PasswordManager {

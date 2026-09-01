@@ -6,6 +6,9 @@ import java.time.Instant;
 
 /**
  * 系统用户。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @TableName("sys_user")
 public class UserDO extends BaseDO {

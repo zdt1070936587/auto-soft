@@ -29,6 +29,9 @@ import java.util.List;
 
 /**
  * 功能开发工作室。无业务逻辑。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @RestController
 @RequestMapping("/api/studio")

@@ -30,6 +30,9 @@ import java.time.Instant;
 
 /**
  * 登录与当前用户。主方法只写步骤。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 @Service
 public class AuthService {

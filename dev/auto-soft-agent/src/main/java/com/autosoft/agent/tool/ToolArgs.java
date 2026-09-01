@@ -13,6 +13,9 @@ import java.util.Map;
 
 /**
  * 解析模型给出的工具参数。不信任模型，调用方仍走 Meta 校验。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
  */
 public class ToolArgs {
 

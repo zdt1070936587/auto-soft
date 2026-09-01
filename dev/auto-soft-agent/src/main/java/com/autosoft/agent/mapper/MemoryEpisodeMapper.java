@@ -11,6 +11,12 @@ import org.apache.ibatis.annotations.Update;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * MemoryEpisode数据访问。
+ *
+ * @author zhaodt
+ * @since 2026-08-31
+ */
 public interface MemoryEpisodeMapper extends BaseMapper<AiMemoryEpisodeDO> {
 
     @Insert("""
