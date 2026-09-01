@@ -19,5 +19,6 @@
 | [dev-setup.md](./dev-setup.md) | 本地启动与排障 |
 | [api.md](./api.md) | 稳定接口一览 |
 | [user-guide.md](./user-guide.md) | 使用手册 |
+| [ppt/](./ppt/) | 演示 PPT 大纲（业务 / 技术 / 管理） |
 | [e2e-mvp.md](./e2e-mvp.md) | 端到端走查记录 |
 | [spec/mvp.spec.md](./spec/mvp.spec.md) | 阶段 2～5 实现规格（As-Built） |
