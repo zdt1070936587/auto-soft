@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NavLinkPayload, OperTimelinePayload } from '@/api/assistant'
+import type { AssistantStructuredPayload } from '@/api/assistant'
 import { parsePayloadJson } from '@/api/assistant'
 import NavLinkCard from './NavLinkCard.vue'
 import OperTimeline from './OperTimeline.vue'
+import ActionPlanCard from './ActionPlanCard.vue'
 
 const props = defineProps<{
   role: string
   content?: string
   payloadJson?: string
-  structured?: NavLinkPayload | OperTimelinePayload | null
+  structured?: AssistantStructuredPayload | null
 }>()
 
 const emit = defineEmits<{ navigate: [] }>()
@@ -29,6 +30,11 @@ const isUser = computed(() => props.role === 'user')
         @navigate="emit('navigate')"
       />
       <OperTimeline v-if="payload?.type === 'oper_timeline' && payload.items?.length" :items="payload.items" />
+      <ActionPlanCard
+        v-if="payload?.type === 'action_plan'"
+        :plan="payload"
+        @navigate="emit('navigate')"
+      />
     </div>
   </div>
 </template>

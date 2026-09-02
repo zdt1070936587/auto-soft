@@ -6,8 +6,7 @@ import {
   createSession,
   listMessages,
   type AiAssistantMessageVO,
-  type NavLinkPayload,
-  type OperTimelinePayload,
+  type AssistantStructuredPayload,
 } from '@/api/assistant'
 import { getToken } from '@/utils/token'
 import AssistantMessageItem from './AssistantMessageItem.vue'
@@ -22,7 +21,7 @@ interface DisplayMessage {
   role: string
   content: string
   payloadJson?: string
-  structured?: NavLinkPayload | OperTimelinePayload | null
+  structured?: AssistantStructuredPayload | null
 }
 
 const sessionId = ref<number | null>(null)
@@ -90,7 +89,7 @@ async function send() {
   streaming.value = true
   thinkingTool.value = ''
   let assistantText = ''
-  let structured: NavLinkPayload | OperTimelinePayload | null = null
+  let structured: AssistantStructuredPayload | null = null
   messages.value.push({ role: 'assistant', content: '', structured: null })
 
   try {
@@ -110,8 +109,8 @@ async function send() {
         thinkingTool.value = typeof tool === 'string' ? tool : ''
       } else if (event.event === 'structured') {
         const type = event.data.type
-        if (type === 'nav_link' || type === 'oper_timeline') {
-          structured = event.data as NavLinkPayload | OperTimelinePayload
+        if (type === 'nav_link' || type === 'oper_timeline' || type === 'action_plan') {
+          structured = event.data as AssistantStructuredPayload
           patchLastAssistant(assistantText, structured)
         }
       } else if (event.event === 'error') {
@@ -132,7 +131,7 @@ async function send() {
 
 function patchLastAssistant(
   content: string,
-  structured: NavLinkPayload | OperTimelinePayload | null,
+  structured: AssistantStructuredPayload | null,
   finalize = false,
 ) {
   const last = messages.value[messages.value.length - 1]
@@ -159,6 +158,12 @@ function toolThinkingLabel(tool: string) {
       return '正在记住…'
     case 'query_my_page_visits':
       return '正在查浏览记录…'
+    case 'search_capabilities':
+      return '正在匹配功能…'
+    case 'prepare_action_draft':
+      return '正在准备操作…'
+    case 'get_capability_schema':
+      return '正在读取表单…'
     default:
       return '正在查询…'
   }

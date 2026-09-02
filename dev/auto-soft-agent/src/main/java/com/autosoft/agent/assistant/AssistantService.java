@@ -1,6 +1,11 @@
 package com.autosoft.agent.assistant;
 
 import com.autosoft.agent.assistant.dto.AssistantChatDTO;
+import com.autosoft.agent.assistant.action.ActionDraftJsonBuilder;
+import com.autosoft.agent.assistant.action.ActionLogSanitizer;
+import com.autosoft.agent.assistant.action.CapabilityDiscoveryService;
+import com.autosoft.agent.assistant.action.model.CapabilityDefinition;
+import com.autosoft.agent.assistant.action.vo.ActionDraftVO;
 import com.autosoft.agent.assistant.memory.MemoryService;
 import com.autosoft.agent.assistant.tool.AssistantToolContext;
 import com.autosoft.agent.assistant.tool.AssistantToolRegistry;
@@ -52,6 +57,8 @@ public class AssistantService {
     private final AssistantToolRegistry toolRegistry;
     private final MemoryService memoryService;
     private final JsonMapper jsonMapper;
+    private final ActionLogSanitizer actionLogSanitizer;
+    private final CapabilityDiscoveryService capabilityDiscoveryService;
 
     public AssistantService(AiAssistantSessionMapper sessionMapper,
                             AiAssistantMessageMapper messageMapper,
@@ -59,7 +66,9 @@ public class AssistantService {
                             OpenCodeGoManager openCodeGoManager,
                             AssistantToolRegistry toolRegistry,
                             MemoryService memoryService,
-                            JsonMapper jsonMapper) {
+                            JsonMapper jsonMapper,
+                            ActionLogSanitizer actionLogSanitizer,
+                            CapabilityDiscoveryService capabilityDiscoveryService) {
         this.sessionMapper = sessionMapper;
         this.messageMapper = messageMapper;
         this.toolLogMapper = toolLogMapper;
@@ -67,6 +76,8 @@ public class AssistantService {
         this.toolRegistry = toolRegistry;
         this.memoryService = memoryService;
         this.jsonMapper = jsonMapper;
+        this.actionLogSanitizer = actionLogSanitizer;
+        this.capabilityDiscoveryService = capabilityDiscoveryService;
     }
 
     public SseEmitter startTurn(Long sessionId, AssistantChatDTO dto) {
@@ -146,6 +157,13 @@ public class AssistantService {
                     lastStructured = structured;
                 }
             }
+            if (context.isAskUser()) {
+                String question = context.getAskQuestion() == null ? "请补充说明。" : context.getAskQuestion();
+                String draftId = context.getLastDraft() == null ? null : context.getLastDraft().getDraftId();
+                persistMessage(session.getId(), "assistant", question, "ask_user", null, null);
+                emit(emitter, "ask_user", Map.of("question", question, "draftId", draftId == null ? "" : draftId));
+                return new TurnResult(question, lastStructured);
+            }
         }
         emit(emitter, "error", Map.of("message", "工具调用次数过多，请简化问题后重试"));
         return new TurnResult("", lastStructured);
@@ -157,7 +175,8 @@ public class AssistantService {
     private String executeOneTool(AiAssistantSessionDO session, AssistantToolContext context,
                                     LlmTurn.ToolCall call, List<Map<String, Object>> messages,
                                     SseEmitter emitter) {
-        emit(emitter, "tool_start", Map.of("tool", nz(call.getName()), "arguments", nz(call.getArgumentsJson())));
+        String sanitizedArgs = actionLogSanitizer.sanitize(nz(call.getArgumentsJson()));
+        emit(emitter, "tool_start", Map.of("tool", nz(call.getName()), "arguments", sanitizedArgs));
         long start = System.currentTimeMillis();
         boolean ok = true;
         String error = null;
@@ -174,15 +193,30 @@ public class AssistantService {
             result = "{\"error\":\"工具执行失败\"}";
             log.warn("assistant tool failed, name={}", call.getName());
         }
-        saveToolLog(session.getId(), call, result, ok, error, (int) (System.currentTimeMillis() - start));
-        persistMessage(session.getId(), "tool", result, call.getName(), call.getId(), null);
-        messages.add(toolMessage(call, result));
+        String sanitizedResult = actionLogSanitizer.sanitize(result);
+        saveToolLog(session.getId(), call, sanitizedArgs, sanitizedResult, ok, error,
+                (int) (System.currentTimeMillis() - start));
+        persistMessage(session.getId(), "tool", sanitizedResult, call.getName(), call.getId(), null);
+        messages.add(toolMessage(call, sanitizedResult));
         emit(emitter, "tool_end", Map.of("tool", nz(call.getName()), "success", ok,
-                "result", AssistantToolRegistry.truncate(result)));
-        return extractStructuredPayload(call.getName(), result);
+                "result", AssistantToolRegistry.truncate(sanitizedResult)));
+
+        if ("prepare_action_draft".equals(call.getName())) {
+            ActionDraftVO draft = context.getLastDraft();
+            if (draft != null) {
+                CapabilityDefinition capability = capabilityDiscoveryService.load(draft.getCapabilityId());
+                if ("draft".equals(draft.getStatus())) {
+                    emit(emitter, "action_missing",
+                            ActionDraftJsonBuilder.buildActionMissing(draft, capability));
+                } else if ("ready".equals(draft.getStatus())) {
+                    return ActionDraftJsonBuilder.buildActionPlanJson(jsonMapper, draft, capability);
+                }
+            }
+        }
+        return extractStructuredPayload(call.getName(), sanitizedResult, context);
     }
 
-    private String extractStructuredPayload(String toolName, String result) {
+    private String extractStructuredPayload(String toolName, String result, AssistantToolContext context) {
         if (result == null || result.isBlank()) {
             return null;
         }
@@ -196,6 +230,13 @@ public class AssistantService {
             if ("get_operation_timeline".equals(toolName)) {
                 map.putIfAbsent("type", "oper_timeline");
                 return jsonMapper.writeValueAsString(map);
+            }
+            if ("prepare_action_draft".equals(toolName) && "ready".equals(map.get("status"))) {
+                ActionDraftVO draft = context.getLastDraft();
+                if (draft != null) {
+                    CapabilityDefinition capability = capabilityDiscoveryService.load(draft.getCapabilityId());
+                    return ActionDraftJsonBuilder.buildActionPlanJson(jsonMapper, draft, capability);
+                }
             }
         } catch (RuntimeException ignored) {
             // not structured
@@ -284,13 +325,13 @@ public class AssistantService {
         return item;
     }
 
-    private void saveToolLog(Long sessionId, LlmTurn.ToolCall call, String result,
+    private void saveToolLog(Long sessionId, LlmTurn.ToolCall call, String argumentsJson, String resultJson,
                              boolean ok, String error, int cost) {
         AiAssistantToolLogDO row = new AiAssistantToolLogDO();
         row.setSessionId(sessionId);
         row.setToolName(call.getName());
-        row.setArgumentsJson(AssistantToolRegistry.truncate(call.getArgumentsJson()));
-        row.setResultJson(AssistantToolRegistry.truncate(result));
+        row.setArgumentsJson(AssistantToolRegistry.truncate(argumentsJson));
+        row.setResultJson(AssistantToolRegistry.truncate(resultJson));
         row.setSuccess(ok ? 1 : 0);
         row.setErrorMsg(error);
         row.setDurationMs(cost);

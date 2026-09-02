@@ -264,3 +264,28 @@ docker compose up -d
 docker compose down -v
 docker compose up -d
 ```
+
+## 阶段 8 P0 已建表（`V2.4.0__assistant_action_draft.sql`）
+
+助手操作草稿（Action Copilot），与 Studio 的 Action Catalog 无关；由 LLM 工具 `prepare_action_draft` 写入，目标页加载后 `consume` 标记已消费。
+
+### ai_assistant_action_draft
+
+| 字段 | 说明 |
+| --- | --- |
+| `id` | UUID 主键 |
+| `session_id` | FK → `ai_assistant_session` |
+| `user_id` | 归属用户 |
+| `capability_id` | 如 `system.user.create`、`runtime.{app}.{entity}.create` |
+| `status` | `draft` / `ready` / `consumed` / `cancelled` / `expired` |
+| `target_path` | 跳转路径，如 `/system/users` |
+| `target_type` | `system_modal` / `runtime_form` |
+| `modal_key` | 系统页 Modal 标识（可选） |
+| `values_json` | 预填字段值（含 password 等敏感项） |
+| `display_json` | 展示用脱敏值 |
+| `missing_json` | 仍缺字段 label 列表 |
+| `unknown_json` | LLM 传入但未识别的 key |
+| `expires_at` | TTL 过期时间（默认 30 分钟，`autosoft.assistant.action-draft-ttl-minutes`） |
+| `consumed_at` | 目标页 consume 时间 |
+
+索引：`session_id+status`、`user_id+created_at DESC`、`expires_at`（partial，`status IN ('draft','ready')`）。

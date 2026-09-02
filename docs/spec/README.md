@@ -5,3 +5,4 @@
 | 文档 | 说明 |
 | --- | --- |
 | [mvp.spec.md](./mvp.spec.md) | 阶段 2～5 实现规格：元数据引擎、工作室、单线审批、安全收口 |
+| [assistant-action-copilot.spec.md](./assistant-action-copilot.spec.md) | 阶段 8 设计规格：Capability、ActionDraft、SSE、API、DDL（待编码） |

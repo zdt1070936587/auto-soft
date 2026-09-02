@@ -23,6 +23,9 @@ public final class AssistantIntentHint {
     private static final Set<String> MEMORY_KEYWORDS = Set.of(
             "我叫", "我是", "记得", "之前", "说过", "我的名", "负责", "你还记得");
 
+    private static final Set<String> ACTION_KEYWORDS = Set.of(
+            "新建", "创建", "添加", "新增", "录入", "登记", "帮我加", "帮我建", "帮我创");
+
     private AssistantIntentHint() {
     }
 
@@ -51,6 +54,9 @@ public final class AssistantIntentHint {
         }
         if (looksMemory(userMessage)) {
             sb.append("[意图提示] 用户可能在询问或提供个人记忆，请使用 recall_user_memory 或 remember_fact。\n");
+        }
+        if (looksAction(userMessage) && !looksOperQuery(userMessage)) {
+            sb.append("[意图提示] 用户可能在请求执行新建操作，请优先 search_capabilities → prepare_action_draft，禁止编造已成功。\n");
         }
         return sb.toString();
     }
@@ -93,5 +99,19 @@ public final class AssistantIntentHint {
             }
         }
         return false;
+    }
+
+    private static boolean looksAction(String text) {
+        for (String kw : ACTION_KEYWORDS) {
+            if (text.contains(kw)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean looksOperQuery(String text) {
+        return text.contains("有没有") || text.contains("是否") || text.contains("操作过")
+                || text.contains("昨天") || text.contains("今天") || text.contains("上周") || text.contains("前天");
     }
 }

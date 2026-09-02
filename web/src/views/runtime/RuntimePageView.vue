@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Spin, Tag } from 'ant-design-vue'
+import { Spin, Tag, message } from 'ant-design-vue'
+import { consumeActionDraft } from '@/api/assistant'
 import PageShell from '@/components/layout/PageShell.vue'
 import SchemaRenderer from '@/components/schema/SchemaRenderer.vue'
 import { getRuntimeSchema, type RuntimeSchemaVO } from '@/api/meta'
+import { useAssistantActionStore } from '@/stores/assistantAction'
 
 const route = useRoute()
+const actionStore = useAssistantActionStore()
 const loading = ref(false)
 const schema = ref<RuntimeSchemaVO | null>(null)
+const schemaRef = ref<InstanceType<typeof SchemaRenderer> | null>(null)
 
 const app = computed(() => String(route.params.app || ''))
 const entity = computed(() => String(route.params.entity || ''))
@@ -37,13 +41,34 @@ async function load() {
   }
 }
 
-onMounted(() => {
-  void load()
-})
+async function applyPendingDraft() {
+  if (!schema.value || !schemaRef.value) {
+    return
+  }
+  await nextTick()
+  const capId = `runtime.${app.value}.${entity.value}.create`
+  const draft = actionStore.consume(capId)
+  if (!draft) {
+    return
+  }
+  schemaRef.value.openCreateWithDraft(draft.values)
+  if (draft.missing.length) {
+    message.warning(`还需填写：${draft.missing.join('、')}`)
+  }
+  await consumeActionDraft(draft.draftId)
+}
 
 watch([app, entity], () => {
   void load()
-})
+}, { immediate: true })
+
+watch(
+  () => [schema.value, schemaRef.value] as const,
+  () => {
+    void applyPendingDraft()
+  },
+  { flush: 'post' },
+)
 </script>
 
 <template>
@@ -57,7 +82,7 @@ watch([app, entity], () => {
 
     <section class="page-panel runtime-panel">
       <Spin :spinning="loading">
-        <SchemaRenderer v-if="schema" :schema="schema" :preview="preview" />
+        <SchemaRenderer v-if="schema" ref="schemaRef" :schema="schema" :preview="preview" />
       </Spin>
     </section>
   </PageShell>

@@ -43,6 +43,9 @@ autosoft:
     schedule:
       min-interval-ms: 300000
   assistant:
+    action:
+      action-draft-ttl-minutes: 30
+      capability-ambiguous-score-gap: 15
     memory:
       enabled: true
       embedding-model: text-embedding-3-small

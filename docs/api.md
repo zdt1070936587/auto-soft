@@ -105,9 +105,22 @@ SSE 事件：`text` / `tool_start` / `tool_end` / `schema_updated` / `error` / `
 | POST | `/api/assistant/memory/facts/{id}/confirm` | 同上 | 确认 fact |
 | GET | `/api/assistant/memory/episodes` | 同上 | 最近 episode 摘要（`?limit=20`） |
 
-SSE 事件：`text` / `tool_start` / `tool_end` / `structured`（`nav_link` / `oper_timeline`）/ `error` / `done`。与 Studio 会话隔离。
+SSE 事件：`text` / `tool_start` / `tool_end` / `structured`（`nav_link` / `oper_timeline` / **`action_plan`**）/ **`action_missing`** / **`ask_user`** / `error` / `done`。与 Studio 会话隔离。
 
-助手工具（内部）：`search_menus`、`query_my_operations`、`get_operation_timeline`、`query_my_page_visits`、`recall_user_memory`、`remember_fact`。操作历史与页面浏览均强制 `user_id = 当前用户`。
+助手工具（内部）：`search_menus`、`query_my_operations`、`get_operation_timeline`、`query_my_page_visits`、`recall_user_memory`、`remember_fact`；**阶段 8 新增**：`search_capabilities`、`get_capability_schema`、`prepare_action_draft`、`get_action_draft`、`ask_user`。操作历史与页面浏览均强制 `user_id = 当前用户`；`tool_log` 中 password 等敏感字段脱敏为 `***`。
+
+### 助手操作草稿（阶段 8 P0）
+
+| 方法 | 路径 | 权限 | 说明 |
+| --- | --- | --- | --- |
+| GET | `/api/assistant/capabilities/search` | `assistant:use` | query: `keyword`, `intent?`, `limit?`；返回 `{ items, ambiguous }` |
+| GET | `/api/assistant/action-drafts/{id}` | 本人 draft | 获取完整草稿（含 `values`） |
+| POST | `/api/assistant/action-drafts/{id}/consume` | 本人 draft | 目标页加载后标记 consumed |
+| POST | `/api/assistant/action-drafts/{id}/cancel` | 本人 draft | 取消草稿 |
+
+写库仍走既有 API：`POST /api/users`（系统用户）、`POST /api/runtime/{app}/{entity}`（动态 CRUD）。助手只预填表单，用户在目标页点「保存」才落库。
+
+详见 [spec/assistant-action-copilot.spec.md](./spec/assistant-action-copilot.spec.md)。
 
 ### 页面访问埋点（阶段 7 P4）
 

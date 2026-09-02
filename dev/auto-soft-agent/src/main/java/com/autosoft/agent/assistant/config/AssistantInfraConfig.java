@@ -12,6 +12,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @Configuration
 @EnableScheduling
-@EnableConfigurationProperties(AssistantMemoryProperties.class)
+@EnableConfigurationProperties({AssistantMemoryProperties.class, AssistantActionProperties.class})
 public class AssistantInfraConfig {
 }

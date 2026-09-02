@@ -10,8 +10,10 @@ import {
   updateUser,
   updateUserStatus,
 } from '@/api/user'
+import { consumeActionDraft } from '@/api/assistant'
 import { listRoleOptions } from '@/api/role'
 import type { RoleVO, UserVO } from '@/api/types'
+import { useAssistantActionStore } from '@/stores/assistantAction'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -157,6 +159,27 @@ async function removeUser(record: UserVO) {
 
 onMounted(async () => {
   await Promise.all([loadRoles(), loadUsers()])
+  const draft = useAssistantActionStore().consume('system.user.create')
+  if (!draft) {
+    return
+  }
+  openCreate()
+  if (draft.values.username != null) {
+    editForm.username = String(draft.values.username)
+  }
+  if (draft.values.password != null) {
+    editForm.password = String(draft.values.password)
+  }
+  if (draft.values.nickname != null) {
+    editForm.nickname = String(draft.values.nickname)
+  }
+  if (Array.isArray(draft.values.roleIds)) {
+    editForm.roleIds = draft.values.roleIds as number[]
+  }
+  if (draft.missing.length) {
+    message.warning(`还需填写：${draft.missing.join('、')}`)
+  }
+  await consumeActionDraft(draft.draftId)
 })
 </script>
 

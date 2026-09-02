@@ -50,6 +50,44 @@ export interface OperTimelinePayload {
   label?: string
 }
 
+export interface ActionPlanFieldItem {
+  label: string
+  display: string
+}
+
+export interface ActionPlanPayload {
+  type: 'action_plan'
+  draftId: string
+  capabilityId: string
+  label?: string
+  targetPath: string
+  targetType: 'system_modal' | 'runtime_form'
+  modalKey?: string
+  summary?: string
+  fields?: ActionPlanFieldItem[]
+  missing?: string[]
+  unknown?: string[]
+  canConfirm?: boolean
+  values?: Record<string, unknown>
+  displayValues?: Record<string, unknown>
+}
+
+export interface ActionDraftVO {
+  draftId: string
+  capabilityId: string
+  status: string
+  label?: string
+  targetPath: string
+  targetType: 'system_modal' | 'runtime_form'
+  modalKey?: string
+  values?: Record<string, unknown>
+  displayValues?: Record<string, unknown>
+  missing?: string[]
+  unknown?: string[]
+}
+
+export type AssistantStructuredPayload = NavLinkPayload | OperTimelinePayload | ActionPlanPayload
+
 export interface ChatPayload {
   message: string
 }
@@ -107,6 +145,18 @@ export function listMemoryEpisodes(limit = 20) {
   return http
     .get<ApiResult<AiMemoryEpisodeVO[]>>('/assistant/memory/episodes', { params: { limit } })
     .then((res) => res.data.data)
+}
+
+export function getActionDraft(draftId: string) {
+  return http.get<ApiResult<ActionDraftVO>>(`/assistant/action-drafts/${draftId}`).then((res) => res.data.data)
+}
+
+export function consumeActionDraft(draftId: string) {
+  return http.post<ApiResult<{ consumed: boolean }>>(`/assistant/action-drafts/${draftId}/consume`).then(() => undefined)
+}
+
+export function cancelActionDraft(draftId: string) {
+  return http.post<ApiResult<{ cancelled: boolean }>>(`/assistant/action-drafts/${draftId}/cancel`).then(() => undefined)
 }
 
 export async function chatStream(
@@ -205,12 +255,12 @@ function parseSse(block: string): AssistantSseEvent | null {
   }
 }
 
-export function parsePayloadJson(payloadJson?: string): NavLinkPayload | OperTimelinePayload | null {
+export function parsePayloadJson(payloadJson?: string): AssistantStructuredPayload | null {
   if (!payloadJson) {
     return null
   }
   try {
-    return JSON.parse(payloadJson) as NavLinkPayload | OperTimelinePayload
+    return JSON.parse(payloadJson) as AssistantStructuredPayload
   } catch {
     return null
   }

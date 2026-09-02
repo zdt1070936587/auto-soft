@@ -529,3 +529,11 @@ Docker 开发环境需在 PostgreSQL 镜像中启用 pgvector（如 `pgvector/pg
 | 我叫李四，是开发 | 写入 fact；下轮能回忆 |
 | 帮我做一个请假单 | 引导去 /studio 或说明需功能开发助手 |
 | 把用户张三删了 | 拒绝执行，仅可查历史是否删过 |
+
+---
+
+## 18. 后续：阶段 8 助手操作 Copilot
+
+阶段 7 范围内助手 **只读**（导航、查 oper log / 页面访问、记忆、闲聊），**不代用户执行写操作**。
+
+若需「用户用自然语言描述 → 系统自动识别功能 → 跳转目标页预填 → 用户确认保存」，见 **[阶段8-助手操作Copilot.md](./阶段8-助手操作Copilot.md)** 与 **[spec/assistant-action-copilot.spec.md](./spec/assistant-action-copilot.spec.md)**。阶段 8 在不动元数据/工作流 IR 的前提下扩展写操作能力；动态 CRUD 发布后自动可发现，无需管理员 Action 配置页。

@@ -79,6 +79,17 @@ function openCreate() {
   editOpen.value = true
 }
 
+function openCreateWithDraft(values: Record<string, unknown>) {
+  openCreate()
+  for (const field of props.schema.fields) {
+    if (values[field.code] !== undefined) {
+      form[field.code] = values[field.code]
+    }
+  }
+}
+
+defineExpose({ openCreateWithDraft })
+
 function openEdit(row: Record<string, unknown>) {
   editingId.value = Number(row.id)
   for (const key of Object.keys(form)) {
